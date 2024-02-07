@@ -17,7 +17,7 @@ const overworld = GlobalVars.overworld;
 /**This number goes from 0 to a 100 */
 let objectiveProgress : number = 0;
 let objectiveFinish : number = 100;
-let standardobjectiveFinishMultiplier = 100;
+let standardObjectiveFinishMultiplier = 1;
 
 interface IObjectiveDataTypes{
     dataType: DataType;
@@ -99,7 +99,7 @@ export function startObjectives(){
 
     objectives = overworld.getEntities({families: ["objective"]})
     objectiveProgress = 0;
-    standardobjectiveFinishMultiplier = Number(getGameVarData(EGameVarId.standardObjectiveFinishMultiplier));
+    standardObjectiveFinishMultiplier = Number(getGameVarData(EGameVarId.standardObjectiveFinishMultiplier));
     
     nextObjective();
 
@@ -113,7 +113,7 @@ function nextObjective(){
     const newObjective = objectives.splice(Math.floor(Math.random() * objectives.length), 1)[0]
     
     if (newObjective) {
-        objectiveFinish = (Number(newObjective.getDynamicProperty("cappingTime")) * standardobjectiveFinishMultiplier) / (survivorBuff + 1);
+        objectiveFinish = (Number(newObjective.getDynamicProperty("objectiveFinish")) * standardObjectiveFinishMultiplier) / (survivorBuff + 1);
         setCurrentObjective(newObjective);
         //world.sendMessage(JSON.stringify(newObjective.location));
     } else {
@@ -132,7 +132,7 @@ function escapeObjective(){
             distance = playerDistance
         }
     })
-    objectiveFinish = (standardobjectiveFinishMultiplier / (survivorBuff + 1)) + distance / 10
+    objectiveFinish = (standardObjectiveFinishMultiplier / (survivorBuff + 1)) + distance / 10
     world.sendMessage("All objectives completed extract");
     world.sendMessage(`Time to extract: ${objectiveFinish.toFixed(2)} seconds`);
     setCurrentObjective(extractPoint);
@@ -164,6 +164,7 @@ function capturePoint(objective: Entity) {
         if(CollisionFunctions.insideSphere(player.location, objective.location, 10, true)){
             objectiveProgress++;
         }
+        world.sendMessage(`Objecive progress: ${objectiveProgress}/${objectiveFinish}`)
     })
     if(objectiveProgress >= objectiveFinish){
         objectiveProgress = 0;
