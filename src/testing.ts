@@ -1,5 +1,5 @@
 import {world, system, Player} from '@minecraft/server';
-import { WorldData, DataType } from './saveData/worldData';
+import { WorldData } from './saveData/worldData';
 import { GlobalVars } from 'globalVars';
 import { addCommand, showHUD } from 'staticScripts/commandFunctions';
 import { ActionFormData, ActionFormResponse, ModalFormData, ModalFormResponse } from '@minecraft/server-ui';

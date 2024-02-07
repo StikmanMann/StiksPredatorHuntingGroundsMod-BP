@@ -1,6 +1,6 @@
 import { system, world, Player } from "@minecraft/server";
-import { GlobalVars } from "globalVars";
-import { DataType, WorldData } from "saveData/worldData";
+import { DataType, GlobalVars } from "globalVars";
+import { WorldData } from "saveData/worldData";
 import { TickFunctions } from "staticScripts/tickFunctions";
 export { SprintClass };
 Object.defineProperties(Player.prototype, {

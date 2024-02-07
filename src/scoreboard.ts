@@ -5,6 +5,8 @@ import { GlobalVars } from "./globalVars"
 
 export {playerJoin, playerLeft}
 class ScoreboardName{
+    objectiveId: any
+    displayName: any
  
 
     constructor(objectiveId, displayName){

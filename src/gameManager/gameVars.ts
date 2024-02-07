@@ -1,7 +1,7 @@
 import { ChatSendBeforeEvent, world } from "@minecraft/server";
 import { ActionFormData, ActionFormResponse, ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
-import { GlobalVars } from "globalVars";
-import { AddDataValues, DataType, WorldData } from "saveData/worldData";
+import { DataType, GlobalVars } from "globalVars";
+import { AddDataValues, WorldData } from "saveData/worldData";
 import { Logger } from "staticScripts/Logger";
 import { addCommand, showHUD } from "staticScripts/commandFunctions";
 
@@ -18,13 +18,13 @@ let gameVars : IGameVars[] = [
     {varName: "predatorSprint", dataType: DataType.vector, data: "10 1.5 2", tooltip: "max stamina, sprint multiplier, stamina regen rate"},
     {varName: "playersNeeded", dataType: DataType.number, data: "2"},
     {varName: "numberOfPredators", dataType: DataType.number, data: "1"},
-    {varName: "standardObjectiveTime", dataType: DataType.number, data: "100", tooltip: "In seconds(Reads at start of game)"},
+    {varName: "standardObjectiveFinishMultiplier", dataType: DataType.number, data: "1", tooltip: "Standard Objective Time Multiplier"},
 ];
 export enum EGameVarId{
     predatorSprint = 0,
     playersNeeded = 1,
     numberOfPredators = 2,
-    standardObjectiveTime = 3
+    standardObjectiveFinishMultiplier = 3
 }
 
 export function getGameVarData(gameVar : EGameVarId) : string{

@@ -2,17 +2,10 @@ import { world, system, Player, ItemTypes, ItemStack, DisplaySlotId, ObjectiveSo
 import { VectorFunctions } from "../staticScripts/vectorFunctions";
 import { Logger, LoggerClass } from '../staticScripts/Logger';
 import { addCommand , CommandValues, showHUD} from 'staticScripts/commandFunctions';
-import { GlobalVars } from 'globalVars';
+import {  DataType, GlobalVars } from '../globalVars';
 import { ActionFormData, ActionFormResponse, ModalFormData, ModalFormResponse } from '@minecraft/server-ui';
 export {WorldData}
 
-
-export enum DataType{
-    number = "number",
-    float = "float",
-    string = "string",
-    boolean = "boolean",
-    vector = "vector"}
 
 export interface AddDataValues{
     dataType: DataType,

@@ -13,16 +13,9 @@ var _WorldData_saveId;
 import { world, system, DisplaySlotId, ObjectiveSortOrder } from '@minecraft/server';
 import { Logger, LoggerClass } from '../staticScripts/Logger';
 import { addCommand, showHUD } from 'staticScripts/commandFunctions';
+import { DataType } from '../globalVars';
 import { ActionFormData, ModalFormData } from '@minecraft/server-ui';
 export { WorldData };
-export var DataType;
-(function (DataType) {
-    DataType["number"] = "number";
-    DataType["float"] = "float";
-    DataType["string"] = "string";
-    DataType["boolean"] = "boolean";
-    DataType["vector"] = "vector";
-})(DataType || (DataType = {}));
 class WorldData {
     get scoreboardName() {
         return this._scoreboardName;

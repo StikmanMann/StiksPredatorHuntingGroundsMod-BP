@@ -1,20 +1,21 @@
 import { world } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
-import { DataType, WorldData } from "saveData/worldData";
+import { DataType } from "globalVars";
+import { WorldData } from "saveData/worldData";
 import { addCommand, showHUD } from "staticScripts/commandFunctions";
 const worldSpawn = world.getDefaultSpawnLocation();
 let gameVars = [
     { varName: "predatorSprint", dataType: DataType.vector, data: "10 1.5 2", tooltip: "max stamina, sprint multiplier, stamina regen rate" },
     { varName: "playersNeeded", dataType: DataType.number, data: "2" },
     { varName: "numberOfPredators", dataType: DataType.number, data: "1" },
-    { varName: "standardObjectiveTime", dataType: DataType.number, data: "100", tooltip: "In seconds(Reads at start of game)" },
+    { varName: "standardObjectiveFinishMultiplier", dataType: DataType.number, data: "1", tooltip: "Standard Objective Time Multiplier" },
 ];
 export var EGameVarId;
 (function (EGameVarId) {
     EGameVarId[EGameVarId["predatorSprint"] = 0] = "predatorSprint";
     EGameVarId[EGameVarId["playersNeeded"] = 1] = "playersNeeded";
     EGameVarId[EGameVarId["numberOfPredators"] = 2] = "numberOfPredators";
-    EGameVarId[EGameVarId["standardObjectiveTime"] = 3] = "standardObjectiveTime";
+    EGameVarId[EGameVarId["standardObjectiveFinishMultiplier"] = 3] = "standardObjectiveFinishMultiplier";
 })(EGameVarId || (EGameVarId = {}));
 export function getGameVarData(gameVar) {
     return gameVars[gameVar].data;

@@ -91,6 +91,7 @@ export function addCommand(commandValue: CommandValues) {
     }
   });
 
+  
   function generateForm(parentPath: string, player: Player): ActionFormData {
     commandHUDIndex.length = 0; // Clear the array
     const uniqueButtonNames = new Set<string>(); // Maintain a set of unique button names
