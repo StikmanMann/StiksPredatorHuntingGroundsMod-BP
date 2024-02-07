@@ -1,0 +1,41 @@
+{
+	"format_version": 2,
+	"metadata": {
+		"authors": ["StikmanMann", "CoderReal"],
+		"generated_with": {
+			"bridge": ["1.8.5"],
+			"blockbench_item_wizard": ["1.0.2"]
+		}
+	},
+	"header": {
+		"name": "SPHGMod",
+		"description": "Mod by StikmanMann and CoderReal and hopefuilly i swear",
+		"min_engine_version": [1, 19, 50],
+		"uuid": "9b34fd8e-6f89-4c8a-8c69-fcbbf443e2dc",
+		"version": [1, 0, 0]
+	},
+	"modules": [
+		{
+			"type": "data",
+			"uuid": "91fe59b0-dcad-435a-a228-e2b432a654a5",
+			"version": [1, 0, 0]
+		},
+		{
+			"type": "script",
+			"language": "javascript",
+			"uuid": "3e96ed8b-580d-453f-a0d0-35a302c89510",
+			"entry": "scripts/main.js",
+			"version": [1, 0, 0]
+		}
+	],
+	"dependencies": [
+		{
+			"module_name": "@minecraft/server",
+			"version": "1.8.0-beta"
+		},
+		{
+			"module_name": "@minecraft/server-ui",
+			"version": "1.2.0-beta"
+		}
+	]
+}

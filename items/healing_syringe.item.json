@@ -1,0 +1,24 @@
+{
+	"format_version": "1.20.30",
+	"minecraft:item": {
+		"description": {
+			"identifier": "stikphg:healing_syringe"
+		},
+		"components": {
+			"minecraft:display_name": {
+				"value": "crack cola"
+			},
+
+			"minecraft:icon": {
+				"texture": "healing_syringe"
+			},
+			"minecraft:food": {
+				"can_always_eat": true
+			},
+			"minecraft:use_duration": 1.375
+
+
+			
+		}
+	}
+}

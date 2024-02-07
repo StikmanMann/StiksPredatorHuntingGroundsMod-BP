@@ -1,0 +1,43 @@
+{
+	"format_version": "1.16.100",
+	"minecraft:entity": {
+		"description": {
+			"identifier": "stikphg:predator_spawnpoint",
+			"is_spawnable": false,
+			"is_summonable": true,
+			"is_experimental": false
+		},
+		"components": {
+			"minecraft:physics": {
+				"has_gravity": false,
+				"has_collision": false
+			},
+			"minecraft:type_family": {
+				"family": ["spawnpoint"]
+			},
+			"minecraft:pushable": {
+				"is_pushable": false
+			},
+			"minecraft:push_through": {
+				"value": 1
+			},
+			"minecraft:health": {
+				"value": 1,
+				"max": 1
+			},
+			"minecraft:nameable": {
+				"allow_name_tag_renaming": true,
+				"always_show": true
+			},
+			"minecraft:despawn": {
+				"despawn_from_chance": false,
+				"despawn_from_distance": {},
+				"despawn_from_inactivity": false,
+				"despawn_from_simulation_edge": false,
+				"min_range_inactivity_timer": 30,
+				"min_range_random_chance": 800,
+				"remove_child_entities": false
+			}
+		}
+	}
+}
