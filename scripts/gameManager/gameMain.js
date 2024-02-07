@@ -11,6 +11,7 @@ entityNames.set("stikphg:player_spawnpoint", "Player Spawnpoint!");
 entityNames.set("stikphg:survivor_spawnpoint", "Survivor Spawnpoint!");
 entityNames.set("stikphg:capture_point", "Capture Point!");
 entityNames.set("stikphg:extract_point", "Extract Point!");
+entityNames.set("stikphg:kill_mobs_point", "Kill Mobs Point!");
 world.afterEvents.entitySpawn.subscribe((event) => {
     try {
         event.entity.nameTag = entityNames.get(event.entity.typeId);

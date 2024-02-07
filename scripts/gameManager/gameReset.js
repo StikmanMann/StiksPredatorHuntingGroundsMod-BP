@@ -16,6 +16,7 @@ export async function resetGame() {
             player.runCommand("clear @s");
             player.removeTag("predator");
             player.removeTag("survivor");
+            player.removeTag("treeJump");
             predators.clear();
             survivors.clear();
             //world.sendMessage(`Player spawned at ${JSON.stringify(spawnLocations[Math.floor(Math.random() * spawnLocations.length)].location)}`)

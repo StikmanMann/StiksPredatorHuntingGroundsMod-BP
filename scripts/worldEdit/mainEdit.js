@@ -1,4 +1,4 @@
-import { world, system, ItemStack, ItemTypes, Enchantment, BlockTypes } from "@minecraft/server";
+import { world, system, ItemStack, ItemTypes, BlockTypes } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { set, undo, redo, copy, paste } from "./commands";
 import { ActionbarMessage, HudManager } from "../hud.js";

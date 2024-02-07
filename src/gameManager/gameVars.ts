@@ -16,15 +16,17 @@ const worldSpawn = world.getDefaultSpawnLocation()
 
 let gameVars : IGameVars[] = [
     {varName: "predatorSprint", dataType: DataType.vector, data: "10 1.5 2", tooltip: "max stamina, sprint multiplier, stamina regen rate"},
+    {varName: "survivorSprint", dataType: DataType.vector, data: "10 1.5 1.5", tooltip: "max stamina, sprint multiplier, stamina regen rate"},
     {varName: "playersNeeded", dataType: DataType.number, data: "2"},
     {varName: "numberOfPredators", dataType: DataType.number, data: "1"},
     {varName: "standardObjectiveFinishMultiplier", dataType: DataType.number, data: "1", tooltip: "Standard Objective Time Multiplier"},
 ];
 export enum EGameVarId{
     predatorSprint = 0,
-    playersNeeded = 1,
-    numberOfPredators = 2,
-    standardObjectiveFinishMultiplier = 3
+    survivorSprint = 1,
+    playersNeeded = 2,
+    numberOfPredators = 3,
+    standardObjectiveFinishMultiplier = 4
 }
 
 export function getGameVarData(gameVar : EGameVarId) : string{

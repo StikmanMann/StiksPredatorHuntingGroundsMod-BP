@@ -14,6 +14,7 @@ export async function resetGame() {
             player.runCommand("clear @s");
             player.removeTag("predator");
             player.removeTag("survivor");
+            player.removeTag("treeJump")
 
             predators.clear();
             survivors.clear();

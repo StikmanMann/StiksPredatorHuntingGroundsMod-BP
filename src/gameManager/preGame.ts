@@ -1,4 +1,4 @@
-import { EntityComponentTypes, Player, Vector3, world } from "@minecraft/server";
+import { EntityComponentTypes, Player, Vector3, system, world } from "@minecraft/server";
 import { GlobalVars } from "globalVars";
 import { SprintClass, sprintClass } from "playerMovement/sprint";
 import { TickFunctions } from "staticScripts/tickFunctions";
@@ -6,11 +6,14 @@ import { EGameVarId, getGameVarData } from "./gameVars";
 import { VectorFunctions } from "staticScripts/vectorFunctions";
 import { preLobby, predators, setMidGame, setPreLobby, setSurvivorBuff, survivorBuff, survivors } from "./privateGameVars";
 import { startObjectives } from "./gameObjectives";
+import { givePredatorKit } from "./predator";
+import { giveSurvivorKit } from "./survivour";
 
 
 
 TickFunctions.addFunction(() => { 
-    if(!preLobby){return;}
+    system.run(async () => {
+        if(!preLobby){return;}
     const playersNeeded = Number(getGameVarData(EGameVarId.playersNeeded))
     const players = GlobalVars.players;
     if(players.length < playersNeeded){
@@ -37,9 +40,11 @@ TickFunctions.addFunction(() => {
         if(predators.has(player)){
             player.sendMessage(`You are a predator!`);
             player.addTag("predator");
+            player.addTag("treeJump")
             const spawnPoints = GlobalVars.overworld.getEntities({type: "stikphg:predator_spawnpoint"})
             if(spawnPoints.length == 0){world.sendMessage("no spawnpoints found bozo"); return}
             player.teleport(spawnPoints[Math.floor(Math.random() * spawnPoints.length)].location);
+            givePredatorKit(player);
 
         }
         else{
@@ -49,6 +54,7 @@ TickFunctions.addFunction(() => {
             player.addTag("survivor");
             if(spawnPoints.length == 0){world.sendMessage("no spawnpoints found bozo"); return}
             player.teleport(spawnPoints[Math.floor(Math.random() * spawnPoints.length)].location);
+            giveSurvivorKit(player);
         }
 
     })
@@ -57,4 +63,6 @@ TickFunctions.addFunction(() => {
     world.sendMessage("OBJECTIVES STARTING")
     startObjectives(); 
     setPreLobby(false);
+    })
+    
 }, 20)

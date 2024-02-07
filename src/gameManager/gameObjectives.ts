@@ -19,6 +19,11 @@ let objectiveProgress : number = 0;
 let objectiveFinish : number = 100;
 let standardObjectiveFinishMultiplier = 1;
 
+enum EObjectives{
+    capturePoint = "stikphg:capture_point",
+    extractPoint = "stikphg:extract_point",
+    killMobsPoint = "stikphg:kill_mobs_point"
+}
 interface IObjectiveDataTypes{
     dataType: DataType;
     id : string;
@@ -34,22 +39,32 @@ interface IObjective{
 
 const objectivesDefinitions : IObjective[] = [
     {
-        typeId: "stikphg:capture_point",
+        typeId: EObjectives.capturePoint,
         dataTypes: [
-            {dataType: DataType.string, id: "objectiveFinish", defaultValue: "100", tooltip : "Capping time (seconds)"}
+            {dataType: DataType.string, id: "objectiveFinish", defaultValue: "100", tooltip : "Capping time (seconds)"},
+            {dataType: DataType.string, id: "captureRange", defaultValue: "10", tooltip : "Capture range (blocks)"}
         ],
         func: (currentObjective) => {capturePoint(currentObjective)}
     },
     {
-        typeId: "stikphg:extract_point",
+        typeId: EObjectives.extractPoint,
         dataTypes: [
-            {dataType: DataType.string, id: "objectiveFinish", defaultValue: "100", tooltip : "Extract time (seconds)"}
+            {dataType: DataType.string, id: "objectiveFinish", defaultValue: "100", tooltip : "Extract time (seconds)"},
+            {dataType: DataType.string, id: "extractRange", defaultValue: "10", tooltip : "Extract range (blocks)"}
         ],
         func: (currentObjective) => {extractPoint(currentObjective)}
+    },
+    {
+        typeId: EObjectives.killMobsPoint,
+        dataTypes: [
+            {dataType: DataType.string, id: "amountOfMobs", defaultValue: "5", tooltip : "Amount of mobs to spawn"},
+            {dataType: DataType.string, id: "mobType", defaultValue: "minecraft:pillager", tooltip : "Mob type"}
+        ],
+        func: (currentObjective) => {killMobsPoint(currentObjective)}
     }
 ];
 
-
+let killMobEntities : Entity[] = [];
 
 let objectives : Entity[] = [];
 
@@ -87,7 +102,13 @@ const editObjective = async (entity : Entity, player : Player) => {
 }
 world.beforeEvents.itemUse.subscribe((eventData) => {
     system.run(() => {
-        const entity = eventData.source.getEntitiesFromViewDirection()[0].entity;
+        let entity : Entity;
+        try{
+            entity = eventData.source.getEntitiesFromViewDirection()[0].entity;
+        }catch(e){
+            return;
+        }
+       
         if(!entity) {return;}
         editObjective(entity, eventData.source);
     })
@@ -111,14 +132,31 @@ function nextObjective(){
     }
     //setCurrentObjective(objectives.splice(Math.floor(Math.random() * objectives.length), 1)[0]);
     const newObjective = objectives.splice(Math.floor(Math.random() * objectives.length), 1)[0]
-    
+    world.setDefaultSpawnLocation(newObjective.location);
     if (newObjective) {
-        objectiveFinish = (Number(newObjective.getDynamicProperty("objectiveFinish")) * standardObjectiveFinishMultiplier) / (survivorBuff + 1);
+
         setCurrentObjective(newObjective);
         //world.sendMessage(JSON.stringify(newObjective.location));
     } else {
         // Handle the case where newObjective is undefined
         world.sendMessage("No objectives available.");
+    }
+
+    switch (currentObjective.typeId) {
+        case EObjectives.capturePoint:
+        case EObjectives.extractPoint:
+            objectiveFinish = (Number(newObjective.getDynamicProperty("objectiveFinish")) * standardObjectiveFinishMultiplier) / (survivorBuff + 1);
+            break;
+        case EObjectives.killMobsPoint:
+            const numberOfMobs = Number(newObjective.getDynamicProperty("amountOfMobs"));
+            const mobType = newObjective.getDynamicProperty("mobType") as string;
+            world.sendMessage(`Spawning ${numberOfMobs} ${mobType} mobs at ${JSON.stringify(newObjective.location)}`);
+            for(let i = 0; i < numberOfMobs; i++){
+                const newMob = newObjective.dimension.spawnEntity("minecraft:zombie", newObjective.location);
+                killMobEntities.push(newMob);
+            }
+            break;
+           
     }
 }
 
@@ -161,10 +199,10 @@ TickFunctions.addFunction(() => {
 function capturePoint(objective: Entity) {
 
     survivors.forEach((player) => {
-        if(CollisionFunctions.insideSphere(player.location, objective.location, 10, true)){
+        if(CollisionFunctions.insideSphere(player.location, objective.location, Number(objective.getDynamicProperty("captureRange")), true)){
             objectiveProgress++;
         }
-        world.sendMessage(`Objecive progress: ${objectiveProgress}/${objectiveFinish}`)
+        //world.sendMessage(`Objecive progress: ${objectiveProgress}/${objectiveFinish}`)
     })
     if(objectiveProgress >= objectiveFinish){
         objectiveProgress = 0;
@@ -173,15 +211,16 @@ function capturePoint(objective: Entity) {
 }
 
 const extractPoint = async(objective: Entity) => {
+    const extractRange = Number(objective.getDynamicProperty("extractRange"))
     objectiveProgress++;
     survivors.forEach((player) => {
-        if(CollisionFunctions.insideSphere(player.location, objective.location, 10, true)){
+        if(CollisionFunctions.insideSphere(player.location, objective.location, extractRange, true)){
             objectiveProgress++;
         }
     })
     if(objectiveProgress >= objectiveFinish){
         survivors.forEach((player) => {
-            if(!CollisionFunctions.insideSphere(player.location, objective.location, 10, true)){
+            if(!CollisionFunctions.insideSphere(player.location, objective.location, extractRange, true)){
                 player.kill();
             }
         })
@@ -190,6 +229,25 @@ const extractPoint = async(objective: Entity) => {
 
     }
 }
+
+const killMobsPoint = async(objective: Entity) => {
+    
+}
+world.afterEvents.entityDie.subscribe((eventData) => {
+    const {deadEntity} = eventData;
+    try{
+        if(killMobEntities.some((entity) => entity.id == deadEntity.id)){
+            objectiveProgress++;
+            if(objectiveProgress >= objectiveFinish){
+                objectiveProgress = 0;
+                nextObjective();
+            }
+        }
+    } catch(e){
+
+    }
+    
+})
 
 /**Creates a string of a progressbar 0 - 100 */
 function progressbar(number : number, maxNumber : number) : string{

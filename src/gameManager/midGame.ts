@@ -4,6 +4,7 @@ import { GlobalVars } from "globalVars";
 import { resetGame } from "./gameReset";
 import { predatorWin, survivorWin } from "./gameWin";
 import { AwaitFunctions } from "staticScripts/awaitFunctions";
+import { SprintClass, sprintClass } from "playerMovement/sprint";
 
 /**Handle players joining/dying mid game*/
 world.afterEvents.playerSpawn.subscribe(async (eventData) => {
@@ -11,6 +12,7 @@ world.afterEvents.playerSpawn.subscribe(async (eventData) => {
 
     world.sendMessage(`Player Died`)
     let {initialSpawn, player} = eventData;
+    sprintClass.changeClassCustom("10 1.5 2.2", player)
     if(!preLobby){
         player.addTag("survivor");
     }
