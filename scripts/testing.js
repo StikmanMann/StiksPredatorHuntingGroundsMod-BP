@@ -90,3 +90,8 @@ function GUIup(player) {
 }
 addCommand({ commandName: "top", commandPrefix: "!!", chatFunction: (eventdata) => { top(eventdata.sender); }, directory: "coderreal things" });
 addCommand({ commandName: "up", commandPrefix: "!!", chatFunction: (eventdata) => { GUIup(eventdata.sender); }, directory: "coderreal things" });
+world.beforeEvents.chatSend.subscribe((eventData) => {
+    system.run(() => {
+        const newMob = eventData.sender.dimension.spawnEntity("minecraft:zombie", eventData.sender.location);
+    });
+});

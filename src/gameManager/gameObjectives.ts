@@ -152,7 +152,14 @@ function nextObjective(){
             const mobType = newObjective.getDynamicProperty("mobType") as string;
             world.sendMessage(`Spawning ${numberOfMobs} ${mobType} mobs at ${JSON.stringify(newObjective.location)}`);
             for(let i = 0; i < numberOfMobs; i++){
-                const newMob = newObjective.dimension.spawnEntity("minecraft:zombie", newObjective.location);
+                let newMob : Entity;
+                try{
+                    newMob = newObjective.dimension.spawnEntity("minecraft:zombie", VectorFunctions.addVector(newObjective.location, {x: Math.random() - 0.5, y: 0, z: Math.random() - 0.5}));
+                } catch(error){
+                    console.warn(`Dailed Spawning ${numberOfMobs} ${mobType} mobs at ${JSON.stringify(newObjective.location)}`, error);
+
+                }
+
                 killMobEntities.push(newMob);
             }
             break;
