@@ -3,6 +3,7 @@ import { WorldData } from './saveData/worldData';
 import { GlobalVars } from 'globalVars';
 import { addCommand, showHUD } from 'staticScripts/commandFunctions';
 import { ActionFormData, ActionFormResponse, ModalFormData, ModalFormResponse } from '@minecraft/server-ui';
+import {  } from 'staticScripts/entitiesFunctions';
 
 const cmdPrefixes = [";;", "!!", ";", "!"]
 function isValueInRange(value: string, minValue: string, maxValue: string): boolean {
@@ -93,8 +94,5 @@ addCommand({commandName: "up", commandPrefix: "!!", chatFunction: (eventdata) =>
 
 
 world.beforeEvents.chatSend.subscribe((eventData) => {
-    system.run(() => {
-        const newMob = eventData.sender.dimension.spawnEntity("minecraft:zombie", eventData.sender.location)
-    })
-
+    //spawnRandomEnities(["minecraft:zombie"], 1, eventData.sender.location, 0, "overworld")
 })

@@ -9,6 +9,7 @@ import { AwaitFunctions } from "staticScripts/awaitFunctions";
 import { EGameVarId, getGameVarData } from "./gameVars";
 import { ModalFormData } from "@minecraft/server-ui";
 import { showHUD } from "staticScripts/commandFunctions";
+import { spawnRandomEntities } from "staticScripts/entitiesFunctions";
 const overworld = GlobalVars.overworld;
 /**This number goes from 0 to a 100 */
 let objectiveProgress = 0;
@@ -50,8 +51,11 @@ let killMobEntities = [];
 let objectives = [];
 const spawnObjective = (eventData) => {
     const { entity } = eventData;
-    const dataTypes = objectivesDefinitions.find((objective) => objective.typeId == entity.typeId).dataTypes;
-    if (!dataTypes) {
+    let dataTypes = [];
+    try {
+        dataTypes = objectivesDefinitions.find((objective) => objective.typeId == entity.typeId).dataTypes;
+    }
+    catch {
         return;
     }
     for (const dataType of dataTypes) {
@@ -95,12 +99,14 @@ world.beforeEvents.itemUse.subscribe((eventData) => {
     });
 });
 export function startObjectives() {
-    objectives = overworld.getEntities({ families: ["objective"] });
-    objectiveProgress = 0;
-    standardObjectiveFinishMultiplier = Number(getGameVarData(EGameVarId.standardObjectiveFinishMultiplier));
-    nextObjective();
+    system.run(async () => {
+        objectives = overworld.getEntities({ families: ["objective"] });
+        objectiveProgress = 0;
+        standardObjectiveFinishMultiplier = Number(getGameVarData(EGameVarId.standardObjectiveFinishMultiplier));
+        nextObjective();
+    });
 }
-function nextObjective() {
+const nextObjective = () => {
     if (objectives.length == 0) {
         escapeObjective();
     }
@@ -117,26 +123,19 @@ function nextObjective() {
     }
     switch (currentObjective.typeId) {
         case EObjectives.capturePoint:
-        case EObjectives.extractPoint:
             objectiveFinish = (Number(newObjective.getDynamicProperty("objectiveFinish")) * standardObjectiveFinishMultiplier) / (survivorBuff + 1);
             break;
         case EObjectives.killMobsPoint:
             const numberOfMobs = Number(newObjective.getDynamicProperty("amountOfMobs"));
             const mobType = newObjective.getDynamicProperty("mobType");
-            world.sendMessage(`Spawning ${numberOfMobs} ${mobType} mobs at ${JSON.stringify(newObjective.location)}`);
+            world.sendMessage(`Spawning ${numberOfMobs} ${mobType} mobs at ${VectorFunctions.vectorToString(newObjective.location)}`);
             for (let i = 0; i < numberOfMobs; i++) {
-                let newMob;
-                try {
-                    newMob = newObjective.dimension.spawnEntity("minecraft:zombie", VectorFunctions.addVector(newObjective.location, { x: Math.random() - 0.5, y: 0, z: Math.random() - 0.5 }));
-                }
-                catch (error) {
-                    console.warn(`Dailed Spawning ${numberOfMobs} ${mobType} mobs at ${JSON.stringify(newObjective.location)}`, error);
-                }
-                killMobEntities.push(newMob);
+                //const location = {x: Math.floor(Math.random() - 0.5) + newObjective.location.x, y: newObjective.location.y, z: Math.floor(Math.random() - 0.5) + newObjective.location.z};
+                killMobEntities = spawnRandomEntities([mobType], 1, newObjective.location, 0, newObjective.dimension.id);
             }
             break;
     }
-}
+};
 function escapeObjective() {
     const extractPoints = GlobalVars.overworld.getEntities({ type: "stikphg:extract_point" });
     const extractPoint = extractPoints[Math.floor(Math.random() * extractPoints.length)];
@@ -203,7 +202,8 @@ const killMobsPoint = async (objective) => {
 world.afterEvents.entityDie.subscribe((eventData) => {
     const { deadEntity } = eventData;
     try {
-        if (killMobEntities.some((entity) => entity.id == deadEntity.id)) {
+        killMobEntities.forEach((entity) => { world.sendMessage(`${entity.id} == ${deadEntity.id}`); });
+        if (killMobEntities.some((entity) => entity == deadEntity)) {
             objectiveProgress++;
             if (objectiveProgress >= objectiveFinish) {
                 objectiveProgress = 0;

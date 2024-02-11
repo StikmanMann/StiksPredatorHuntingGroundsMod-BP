@@ -97,7 +97,6 @@ class WorldData {
                         this.removeAllData();
                         break;
                 }
-                world.sendMessage(event.message + " ;;showAsScoreboard " + this._scoreboardName);
             });
         }
         this.updateData();

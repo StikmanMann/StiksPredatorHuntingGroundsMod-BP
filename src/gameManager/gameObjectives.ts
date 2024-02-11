@@ -11,6 +11,7 @@ import { AwaitFunctions } from "staticScripts/awaitFunctions";
 import { EGameVarId, getGameVarData } from "./gameVars";
 import { ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
 import { showHUD } from "staticScripts/commandFunctions";
+import { spawnRandomEntities } from "staticScripts/entitiesFunctions";
 
 const overworld = GlobalVars.overworld;
 
@@ -70,8 +71,13 @@ let objectives : Entity[] = [];
 
 const spawnObjective = (eventData : EntitySpawnAfterEvent) => {
     const {entity} = eventData;
-    const dataTypes = objectivesDefinitions.find((objective) => objective.typeId == entity.typeId).dataTypes;
-    if(!dataTypes) {return;}
+    let dataTypes : IObjectiveDataTypes[] = [];
+    try{
+        dataTypes = objectivesDefinitions.find((objective) => objective.typeId == entity.typeId).dataTypes;
+    }catch{
+        return;
+    }
+
     for(const dataType of dataTypes){
         entity.setDynamicProperty(dataType.id, dataType.defaultValue);
     }
@@ -117,16 +123,18 @@ world.beforeEvents.itemUse.subscribe((eventData) => {
 }) 
 
 export function startObjectives(){
+    system.run(async () => {
+        objectives = overworld.getEntities({families: ["objective"]})
+        objectiveProgress = 0;
+        standardObjectiveFinishMultiplier = Number(getGameVarData(EGameVarId.standardObjectiveFinishMultiplier));
+        
+        nextObjective();
+    })
 
-    objectives = overworld.getEntities({families: ["objective"]})
-    objectiveProgress = 0;
-    standardObjectiveFinishMultiplier = Number(getGameVarData(EGameVarId.standardObjectiveFinishMultiplier));
-    
-    nextObjective();
 
 }
 
-function nextObjective(){
+const nextObjective = () => {
     if(objectives.length == 0){
         escapeObjective();
     }
@@ -144,23 +152,17 @@ function nextObjective(){
 
     switch (currentObjective.typeId) {
         case EObjectives.capturePoint:
-        case EObjectives.extractPoint:
             objectiveFinish = (Number(newObjective.getDynamicProperty("objectiveFinish")) * standardObjectiveFinishMultiplier) / (survivorBuff + 1);
             break;
         case EObjectives.killMobsPoint:
             const numberOfMobs = Number(newObjective.getDynamicProperty("amountOfMobs"));
             const mobType = newObjective.getDynamicProperty("mobType") as string;
-            world.sendMessage(`Spawning ${numberOfMobs} ${mobType} mobs at ${JSON.stringify(newObjective.location)}`);
+            world.sendMessage(`Spawning ${numberOfMobs} ${mobType} mobs at ${VectorFunctions.vectorToString(newObjective.location)}`);
             for(let i = 0; i < numberOfMobs; i++){
-                let newMob : Entity;
-                try{
-                    newMob = newObjective.dimension.spawnEntity("minecraft:zombie", VectorFunctions.addVector(newObjective.location, {x: Math.random() - 0.5, y: 0, z: Math.random() - 0.5}));
-                } catch(error){
-                    console.warn(`Dailed Spawning ${numberOfMobs} ${mobType} mobs at ${JSON.stringify(newObjective.location)}`, error);
+                //const location = {x: Math.floor(Math.random() - 0.5) + newObjective.location.x, y: newObjective.location.y, z: Math.floor(Math.random() - 0.5) + newObjective.location.z};
+      
+                killMobEntities = spawnRandomEntities([mobType], 1, newObjective.location, 0, newObjective.dimension.id)
 
-                }
-
-                killMobEntities.push(newMob);
             }
             break;
            
@@ -243,7 +245,8 @@ const killMobsPoint = async(objective: Entity) => {
 world.afterEvents.entityDie.subscribe((eventData) => {
     const {deadEntity} = eventData;
     try{
-        if(killMobEntities.some((entity) => entity.id == deadEntity.id)){
+        killMobEntities.forEach((entity) => { world.sendMessage(`${entity.id} == ${deadEntity.id}`) });
+        if(killMobEntities.some((entity) => entity == deadEntity)){
             objectiveProgress++;
             if(objectiveProgress >= objectiveFinish){
                 objectiveProgress = 0;

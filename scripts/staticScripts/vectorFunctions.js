@@ -37,7 +37,7 @@ class VectorFunctions {
      * @returns {String}
      */
     static vectorToString(vector) {
-        return `x:${vector.x} y:${vector.y} z:${vector.z}`;
+        return `x:${vector.x.toFixed(2)} y:${vector.y.toFixed(2)} z:${vector.z.toFixed(2)}`;
     }
     /**
      *
