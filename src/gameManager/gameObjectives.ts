@@ -69,6 +69,7 @@ let killMobEntities : Entity[] = [];
 
 let objectives : Entity[] = [];
 
+
 const spawnObjective = (eventData : EntitySpawnAfterEvent) => {
     const {entity} = eventData;
     let dataTypes : IObjectiveDataTypes[] = [];
@@ -137,6 +138,7 @@ export function startObjectives(){
 const nextObjective = () => {
     if(objectives.length == 0){
         escapeObjective();
+        return;
     }
     //setCurrentObjective(objectives.splice(Math.floor(Math.random() * objectives.length), 1)[0]);
     const newObjective = objectives.splice(Math.floor(Math.random() * objectives.length), 1)[0]
@@ -155,15 +157,10 @@ const nextObjective = () => {
             objectiveFinish = (Number(newObjective.getDynamicProperty("objectiveFinish")) * standardObjectiveFinishMultiplier) / (survivorBuff + 1);
             break;
         case EObjectives.killMobsPoint:
-            const numberOfMobs = Number(newObjective.getDynamicProperty("amountOfMobs"));
+            objectiveFinish = (Number(newObjective.getDynamicProperty("amountOfMobs")) * standardObjectiveFinishMultiplier) / (survivorBuff + 1);
             const mobType = newObjective.getDynamicProperty("mobType") as string;
-            world.sendMessage(`Spawning ${numberOfMobs} ${mobType} mobs at ${VectorFunctions.vectorToString(newObjective.location)}`);
-            for(let i = 0; i < numberOfMobs; i++){
-                //const location = {x: Math.floor(Math.random() - 0.5) + newObjective.location.x, y: newObjective.location.y, z: Math.floor(Math.random() - 0.5) + newObjective.location.z};
-      
-                killMobEntities = spawnRandomEntities([mobType], 1, newObjective.location, 0, newObjective.dimension.id)
-
-            }
+            world.sendMessage(`Spawning ${objectiveFinish} ${mobType} mobs at ${VectorFunctions.vectorToString(newObjective.location)}`);
+            killMobEntities = spawnRandomEntities([mobType], objectiveFinish, newObjective.location, 0, newObjective.dimension.id)
             break;
            
     }
@@ -172,6 +169,7 @@ const nextObjective = () => {
 function escapeObjective(){
     const extractPoints = GlobalVars.overworld.getEntities({type: "stikphg:extract_point"})
     const extractPoint = extractPoints[Math.floor(Math.random() * extractPoints.length)];
+    world.setDefaultSpawnLocation(extractPoint.location);
     let distance : number;
     survivors.forEach((player) => {
         let playerDistance = VectorFunctions.vectorLength(VectorFunctions.subtractVector(player.location, (extractPoint.location)))
@@ -244,8 +242,13 @@ const killMobsPoint = async(objective: Entity) => {
 }
 world.afterEvents.entityDie.subscribe((eventData) => {
     const {deadEntity} = eventData;
+   
+    for(const player of survivors){
+        player.onScreenDisplay.setActionBar(progressbar(objectiveProgress, objectiveFinish))
+    }
+    
     try{
-        killMobEntities.forEach((entity) => { world.sendMessage(`${entity.id} == ${deadEntity.id}`) });
+        //killMobEntities.forEach((entity) => { world.sendMessage(`${entity.id} == ${deadEntity.id}`) });
         if(killMobEntities.some((entity) => entity == deadEntity)){
             objectiveProgress++;
             if(objectiveProgress >= objectiveFinish){

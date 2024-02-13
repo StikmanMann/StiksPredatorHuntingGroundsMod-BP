@@ -26,7 +26,7 @@ export const spawnRandomEntities = (
     spread: number = 0,
     dimensionID: string = "overworld"
 ): Entity[] => {
-    const spawnedEntities: Entity[] = [];
+    let spawnedEntities: Entity[] = [];
 
     const dimension = world.getDimension(dimensionID);
 
@@ -34,14 +34,17 @@ export const spawnRandomEntities = (
         const spawnLocation = { x: location.x, y: location.y, z: location.z };
         const entityType = entityTypes[Math.floor(Math.random() * entityTypes.length)];
 
+        let newMob : Entity | null = null;
         try {
-            const newMob = dimension.spawnEntity(entityType, spawnLocation);
-            spawnedEntities.push(newMob);
+            spawnedEntities.push(dimension.spawnEntity(entityType, spawnLocation));
+            
             world.sendMessage(`${spawnedEntities.length} spawned ${entityType} at ${VectorFunctions.vectorToString(spawnLocation)}`);
         } catch (error) {
             console.warn(error);
-            spawnedEntities.push(FAILED_SPAWN);
+            continue;
+            //spawnedEntities.push(newMob);
         }
+     //   spawnedEntities.push(newMob);
     }
 
     return spawnedEntities;

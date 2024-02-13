@@ -18,20 +18,22 @@ const FAILED_SPAWN = null;
  * @throws If there is an error spawning the entities.
  */
 export const spawnRandomEntities = (entityTypes, amount, location, spread = 0, dimensionID = "overworld") => {
-    const spawnedEntities = [];
+    let spawnedEntities = [];
     const dimension = world.getDimension(dimensionID);
     for (let i = 0; i < amount; i++) {
         const spawnLocation = { x: location.x, y: location.y, z: location.z };
         const entityType = entityTypes[Math.floor(Math.random() * entityTypes.length)];
+        let newMob = null;
         try {
-            const newMob = dimension.spawnEntity(entityType, spawnLocation);
-            spawnedEntities.push(newMob);
+            spawnedEntities.push(dimension.spawnEntity(entityType, spawnLocation));
             world.sendMessage(`${spawnedEntities.length} spawned ${entityType} at ${VectorFunctions.vectorToString(spawnLocation)}`);
         }
         catch (error) {
             console.warn(error);
-            spawnedEntities.push(FAILED_SPAWN);
+            continue;
+            //spawnedEntities.push(newMob);
         }
+        //   spawnedEntities.push(newMob);
     }
     return spawnedEntities;
 };
