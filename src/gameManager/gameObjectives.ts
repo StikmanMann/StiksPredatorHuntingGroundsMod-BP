@@ -23,7 +23,8 @@ let standardObjectiveFinishMultiplier = 1;
 enum EObjectives{
     capturePoint = "stikphg:capture_point",
     extractPoint = "stikphg:extract_point",
-    killMobsPoint = "stikphg:kill_mobs_point"
+    killMobsPoint = "stikphg:kill_mobs_point",
+    fusePoint = "stikphg:fuse_point"
 }
 interface IObjectiveDataTypes{
     dataType: DataType;
@@ -62,10 +63,19 @@ const objectivesDefinitions : IObjective[] = [
             {dataType: DataType.string, id: "mobType", defaultValue: "minecraft:pillager", tooltip : "Mob type"}
         ],
         func: (currentObjective) => {killMobsPoint(currentObjective)}
+    },
+    {
+        typeId: EObjectives.fusePoint,
+        dataTypes: [
+            {dataType: DataType.string, id: "fuseSpawnRange", defaultValue: "30", tooltip : "Fuse range (blocks)"}
+        ],
+        func: (currentObjective) => {fusePoint(currentObjective)}
     }
 ];
 
 let killMobEntities : Entity[] = [];
+
+let fuseSpawns : Entity[] = [];
 
 let objectives : Entity[] = [];
 
@@ -162,6 +172,14 @@ const nextObjective = () => {
             world.sendMessage(`Spawning ${objectiveFinish} ${mobType} mobs at ${VectorFunctions.vectorToString(newObjective.location)}`);
             killMobEntities = spawnRandomEntities([mobType], objectiveFinish, newObjective.location, 0, newObjective.dimension.id)
             break;
+        case EObjectives.fusePoint:
+            const fuseSpawnRange = Number(newObjective.getDynamicProperty("fuseSpawnRange"));
+            fuseSpawns = newObjective.dimension.getEntities({maxDistance: fuseSpawnRange, location: newObjective.location, type: "stikphg:fuse_spawn"});
+            if(fuseSpawns.length == 0){
+                world.sendMessage("No fuses found.\n Try increasing fuseSpawnRange or adding fuse_spawn\n Switching to next objective");
+                nextObjective();
+            }
+            break;
            
     }
 }
@@ -217,25 +235,7 @@ function capturePoint(objective: Entity) {
     }
 }
 
-const extractPoint = async(objective: Entity) => {
-    const extractRange = Number(objective.getDynamicProperty("extractRange"))
-    objectiveProgress++;
-    survivors.forEach((player) => {
-        if(CollisionFunctions.insideSphere(player.location, objective.location, extractRange, true)){
-            objectiveProgress++;
-        }
-    })
-    if(objectiveProgress >= objectiveFinish){
-        survivors.forEach((player) => {
-            if(!CollisionFunctions.insideSphere(player.location, objective.location, extractRange, true)){
-                player.kill();
-            }
-        })
-        await AwaitFunctions.waitTicks(20)
-        survivorWin();
 
-    }
-}
 
 const killMobsPoint = async(objective: Entity) => {
     
@@ -262,6 +262,29 @@ world.afterEvents.entityDie.subscribe((eventData) => {
     
 })
 
+const fusePoint = async(objective: Entity) => {
+    
+}
+
+const extractPoint = async(objective: Entity) => {
+    const extractRange = Number(objective.getDynamicProperty("extractRange"))
+    objectiveProgress++;
+    survivors.forEach((player) => {
+        if(CollisionFunctions.insideSphere(player.location, objective.location, extractRange, true)){
+            objectiveProgress++;
+        }
+    })
+    if(objectiveProgress >= objectiveFinish){
+        survivors.forEach((player) => {
+            if(!CollisionFunctions.insideSphere(player.location, objective.location, extractRange, true)){
+                player.kill();
+            }
+        })
+        await AwaitFunctions.waitTicks(20)
+        survivorWin();
+
+    }
+}
 /**Creates a string of a progressbar 0 - 100 */
 function progressbar(number : number, maxNumber : number) : string{
     let progressbar = "§a";
