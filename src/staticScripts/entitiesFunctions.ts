@@ -1,10 +1,6 @@
 import { Entity, Vector3, system, world } from "@minecraft/server";
 import { VectorFunctions } from "./vectorFunctions";
 
-/**
- * Placeholder value for failed entity spawn attempts.
- */
-const FAILED_SPAWN: Entity | null = null;
 
 /**
  * Spawns random entities in the specified location and dimension.
@@ -34,7 +30,6 @@ export const spawnRandomEntities = (
         const spawnLocation = { x: location.x, y: location.y, z: location.z };
         const entityType = entityTypes[Math.floor(Math.random() * entityTypes.length)];
 
-        let newMob : Entity | null = null;
         try {
             spawnedEntities.push(dimension.spawnEntity(entityType, spawnLocation));
             
@@ -42,9 +37,8 @@ export const spawnRandomEntities = (
         } catch (error) {
             console.warn(error);
             continue;
-            //spawnedEntities.push(newMob);
         }
-     //   spawnedEntities.push(newMob);
+
     }
 
     return spawnedEntities;
