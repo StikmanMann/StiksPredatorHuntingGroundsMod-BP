@@ -1,10 +1,6 @@
 import { world } from "@minecraft/server";
 import { VectorFunctions } from "./vectorFunctions";
 /**
- * Placeholder value for failed entity spawn attempts.
- */
-const FAILED_SPAWN = null;
-/**
  * Spawns random entities in the specified location and dimension.
  *
  * @param entityTypes An array of entity type IDs to spawn.
@@ -18,22 +14,19 @@ const FAILED_SPAWN = null;
  * @throws If there is an error spawning the entities.
  */
 export const spawnRandomEntities = (entityTypes, amount, location, spread = 0, dimensionID = "overworld") => {
-    let spawnedEntities = [];
+    let spawnedEntities = Array[amount];
     const dimension = world.getDimension(dimensionID);
     for (let i = 0; i < amount; i++) {
         const spawnLocation = { x: location.x, y: location.y, z: location.z };
         const entityType = entityTypes[Math.floor(Math.random() * entityTypes.length)];
-        let newMob = null;
         try {
-            spawnedEntities.push(dimension.spawnEntity(entityType, spawnLocation));
+            spawnedEntities[i] = (dimension.spawnEntity(entityType, spawnLocation));
             world.sendMessage(`${spawnedEntities.length} spawned ${entityType} at ${VectorFunctions.vectorToString(spawnLocation)}`);
         }
         catch (error) {
             console.warn(error);
             continue;
-            //spawnedEntities.push(newMob);
         }
-        //   spawnedEntities.push(newMob);
     }
     return spawnedEntities;
 };

@@ -1,7 +1,6 @@
 import { world, system, ItemStack, ItemTypes, BlockTypes } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { set, undo, redo, copy, paste } from "./commands";
-import { ActionbarMessage, HudManager } from "../hud.js";
 export { getPlayerObject };
 function getPlayerObject(player) {
     return activePlayers.get(player.name);
@@ -9,6 +8,7 @@ function getPlayerObject(player) {
 console.warn("playerCODESS");
 import { setUi } from "./set.js";
 import { replaceUi } from "./replace.js";
+import { addActionbarMessage } from "hud";
 const commandPrefix = ";";
 class PlayerClass {
     constructor(playerName) {
@@ -269,11 +269,6 @@ function undoAdd(block, affectedBlocks, playerInstance, i) {
                         wand.nameTag = "§dWand";
                         wand.setLore(["I hope your happy alivejy :D", "+10 coolness"]);
                         /**
-                         * @type {ItemEnchantsComponent}
-                         */
-                        let enchants = wand.getComponent("enchantments");
-                        enchants.enchantments.addEnchantment(new Enchantment("unbreaking", 3));
-                        /**
                          * @type {EntityInventoryComponent}
                          */
                         let inventory = player.getComponent("inventory");
@@ -374,7 +369,7 @@ system.runInterval(() => {
             const playerInstance = activePlayers.get(player.name);
             playerInstance.tSLT++;
             const block = player.getBlockFromViewDirection().block;
-            HudManager.addActionbarMessage(new ActionbarMessage(player, `§d${block.typeId} at x: ${block.location.x}  y: ${block.location.y}  z: ${block.location.z}`, 1));
+            addActionbarMessage({ player: player, message: `§d${block.typeId} at x: ${block.location.x}  y: ${block.location.y}  z: ${block.location.z}`, lifetime: 1 });
             /**
              * @type {EntityInventoryComponent}
              */

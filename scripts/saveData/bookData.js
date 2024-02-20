@@ -125,7 +125,7 @@ _a = BookData, _BookData_chest = new WeakMap(), _BookData_chestContainer = new W
                 //console.warn(`Book - Trying to access block at ${VectorFunctions.vectorToString(chestLocation)}`);
                 if (_a.overworld.getBlock(chestLocation)) {
                     //console.warn(`Success to access block at ${VectorFunctions.vectorToString(chestLocation)}`);
-                    resolve();
+                    resolve(null);
                     system.clearRun(worldLoad);
                 }
             }

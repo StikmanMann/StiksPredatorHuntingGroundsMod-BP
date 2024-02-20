@@ -20,7 +20,7 @@ import { VectorFunctions } from "./staticScripts/vectorFunctions";
 import { GlobalVars } from "./globalVars";
 import { TickFunctions } from "./staticScripts/tickFunctions";
 import { DebugOptions } from "./debugging/debugCommands";
-import { ActionbarMessage, HudManager } from "./hud";
+import { addActionbarMessage } from "hud";
 class LaunchpadVars {
     /**
      *
@@ -65,7 +65,7 @@ class Launchpad extends BookData {
                         //world.sendMessage(`${speed}`)
                         player.playSound("firework.launch");
                         if (DebugOptions.debug) {
-                            HudManager.addActionbarMessage(new ActionbarMessage(player, `DEBUG - Launchpad ${i} with angle ${launchpadVars.angle}`, 40));
+                            addActionbarMessage({ player: player, message: `DEBUG - Launchpad ${i} with angle ${launchpadVars.angle}`, lifetime: 40 });
                         }
                         player.applyKnockback(Math.cos(launchpadVars.angle * (Math.PI / 180)), Math.sin(launchpadVars.angle * (Math.PI / 180)), launchpadVars.horizontalPower, launchpadVars.verticalPower);
                     }

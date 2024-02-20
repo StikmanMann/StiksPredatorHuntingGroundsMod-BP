@@ -1,4 +1,4 @@
-import { system, world } from "@minecraft/server";
+import { ItemStack, ItemTypes, system, world } from "@minecraft/server";
 import { DataType, GlobalVars } from "globalVars";
 import { currentObjective, setCurrentObjective, survivorBuff, survivors } from "./privateGameVars";
 import { CollisionFunctions } from "staticScripts/collisionFunctions";
@@ -10,6 +10,7 @@ import { EGameVarId, getGameVarData } from "./gameVars";
 import { ModalFormData } from "@minecraft/server-ui";
 import { showHUD } from "staticScripts/commandFunctions";
 import { spawnRandomEntities } from "staticScripts/entitiesFunctions";
+import { addActionbarMessage } from "hud";
 const overworld = GlobalVars.overworld;
 /**This number goes from 0 to a 100 */
 let objectiveProgress = 0;
@@ -20,6 +21,7 @@ var EObjectives;
     EObjectives["capturePoint"] = "stikphg:capture_point";
     EObjectives["extractPoint"] = "stikphg:extract_point";
     EObjectives["killMobsPoint"] = "stikphg:kill_mobs_point";
+    EObjectives["fusePoint"] = "stikphg:fuse_point";
 })(EObjectives || (EObjectives = {}));
 const objectivesDefinitions = [
     {
@@ -45,10 +47,23 @@ const objectivesDefinitions = [
             { dataType: DataType.string, id: "mobType", defaultValue: "minecraft:pillager", tooltip: "Mob type" }
         ],
         func: (currentObjective) => { killMobsPoint(currentObjective); }
+    },
+    {
+        typeId: EObjectives.fusePoint,
+        dataTypes: [
+            { dataType: DataType.string, id: "fuseSpawnRange", defaultValue: "30", tooltip: "Fuse range (blocks)" },
+            { dataType: DataType.string, id: "captureRange", defaultValue: "10", tooltip: "Capture range (blocks)" },
+            { dataType: DataType.string, id: "fuseItem", defaultValue: "stikphg:fuse", tooltip: "Fuse item" },
+            { dataType: DataType.string, id: "objectiveFinish", defaultValue: "10", tooltip: "Amount of Fuses needed" }
+        ],
+        func: (currentObjective) => { fusePoint(currentObjective); }
     }
 ];
+const fuseItem = new ItemStack(ItemTypes.get("stikphg:fuse"));
 let killMobEntities = [];
+let fuseSpawn;
 let objectives = [];
+let captureRange;
 const spawnObjective = (eventData) => {
     const { entity } = eventData;
     let dataTypes = [];
@@ -132,6 +147,19 @@ const nextObjective = () => {
             world.sendMessage(`Spawning ${objectiveFinish} ${mobType} mobs at ${VectorFunctions.vectorToString(newObjective.location)}`);
             killMobEntities = spawnRandomEntities([mobType], objectiveFinish, newObjective.location, 0, newObjective.dimension.id);
             break;
+        case EObjectives.fusePoint:
+            const fuseSpawnRange = Number(newObjective.getDynamicProperty("fuseSpawnRange"));
+            let fuseSpawns = newObjective.dimension.getEntities({ maxDistance: fuseSpawnRange, location: newObjective.location, type: "stikphg:fuse_spawn" });
+            if (fuseSpawns.length == 0) {
+                world.sendMessage("No fuses found.\n Try increasing fuseSpawnRange or adding fuse_spawn\n Switching to next objective");
+                nextObjective();
+                break;
+            }
+            objectiveFinish = (Number(newObjective.getDynamicProperty("objectiveFinish")) * standardObjectiveFinishMultiplier) / (survivorBuff + 1);
+            world.sendMessage(`setting up fuse ${objectiveFinish} but also this ${newObjective.getDynamicProperty("objectiveFinish")}`);
+            captureRange = Number(newObjective.getDynamicProperty("captureRange"));
+            fuseSpawn = fuseSpawns[Math.floor(Math.random() * fuseSpawns.length)];
+            break;
     }
 };
 function escapeObjective() {
@@ -163,7 +191,7 @@ TickFunctions.addFunction(() => {
     catch (error) {
     }
     survivors.forEach((player) => {
-        player.onScreenDisplay.setActionBar(progressbar(objectiveProgress, objectiveFinish));
+        addActionbarMessage({ player: player, message: progressbar(objectiveProgress, objectiveFinish), lifetime: 20 });
     });
 }, 20);
 function capturePoint(objective) {
@@ -178,24 +206,6 @@ function capturePoint(objective) {
         nextObjective();
     }
 }
-const extractPoint = async (objective) => {
-    const extractRange = Number(objective.getDynamicProperty("extractRange"));
-    objectiveProgress++;
-    survivors.forEach((player) => {
-        if (CollisionFunctions.insideSphere(player.location, objective.location, extractRange, true)) {
-            objectiveProgress++;
-        }
-    });
-    if (objectiveProgress >= objectiveFinish) {
-        survivors.forEach((player) => {
-            if (!CollisionFunctions.insideSphere(player.location, objective.location, extractRange, true)) {
-                player.kill();
-            }
-        });
-        await AwaitFunctions.waitTicks(20);
-        survivorWin();
-    }
-};
 const killMobsPoint = async (objective) => {
 };
 world.afterEvents.entityDie.subscribe((eventData) => {
@@ -216,6 +226,50 @@ world.afterEvents.entityDie.subscribe((eventData) => {
     catch (e) {
     }
 });
+const fusePoint = async (objective) => {
+    const players = GlobalVars.overworld.getPlayers();
+    const fuseRange = 1; //Make this a gmaevariable
+    world.sendMessage(`Spawning ${objectiveFinish} fuses at ${VectorFunctions.vectorToString(fuseSpawn.location)}`);
+    for (const player of players) {
+        if (CollisionFunctions.insideSphere(player.location, fuseSpawn.location, fuseRange, true)) {
+            player.getComponent("inventory").container.addItem(fuseItem);
+            const fuseSpawnRange = Number(objective.getDynamicProperty("fuseSpawnRange"));
+            let fuseSpawns = objective.dimension.getEntities({ maxDistance: fuseSpawnRange, location: objective.location, type: "stikphg:fuse_spawn" });
+            if (fuseSpawns.length == 0) {
+                world.sendMessage("No fuses found.\n Try increasing fuseSpawnRange or adding fuse_spawn\n Switching to next objective");
+                nextObjective();
+                break;
+            }
+            fuseSpawn = fuseSpawns[Math.floor(Math.random() * fuseSpawns.length)];
+        }
+        if (CollisionFunctions.insideSphere(player.location, objective.location, captureRange, true)) {
+            const inventory = player.getComponent("inventory");
+            const hasFuse = inventory.container.getItem(player.selectedSlot).typeId == fuseItem.typeId;
+            if (hasFuse) {
+                inventory.container.setItem(player.selectedSlot, null);
+                objectiveProgress++;
+            }
+        }
+    }
+};
+const extractPoint = async (objective) => {
+    const extractRange = Number(objective.getDynamicProperty("extractRange"));
+    objectiveProgress++;
+    survivors.forEach((player) => {
+        if (CollisionFunctions.insideSphere(player.location, objective.location, extractRange, true)) {
+            objectiveProgress++;
+        }
+    });
+    if (objectiveProgress >= objectiveFinish) {
+        survivors.forEach((player) => {
+            if (!CollisionFunctions.insideSphere(player.location, objective.location, extractRange, true)) {
+                player.kill();
+            }
+        });
+        await AwaitFunctions.waitTicks(20);
+        survivorWin();
+    }
+};
 /**Creates a string of a progressbar 0 - 100 */
 function progressbar(number, maxNumber) {
     let progressbar = "§a";

@@ -26,7 +26,6 @@ class GameVars extends WorldData {
     constructor(saveId, loggerId, scorebaordName, expectedValueTypes, dontUseNormalCommands) {
         super(saveId, loggerId, scorebaordName, expectedValueTypes, dontUseNormalCommands);
         addCommand({ commandName: "changeValue", chatFunction: ((event) => { this.changeValueHud(event); }), directory: "GameVariables", commandPrefix: ";;" });
-        world.sendMessage(`${this.worldData.length} == ${gameVars.length}`);
         if (this.worldData.length != gameVars.length) {
             world.sendMessage("WorldData length is not equal to gameVars length, reseting data...");
             this.removeAllData();

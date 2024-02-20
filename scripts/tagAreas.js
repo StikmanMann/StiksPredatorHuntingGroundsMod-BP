@@ -7,8 +7,9 @@ import { CollisionFunctions } from "./staticScripts/collisionFunctions";
 import { DataType, GlobalVars } from "./globalVars";
 import { TickFunctions } from "./staticScripts/tickFunctions";
 import { DebugOptions } from "./debugging/debugCommands";
-import { ActionbarMessage, HudManager } from "./hud";
+;
 import { WorldData } from "saveData/worldData";
+import { addActionbarMessage } from "hud";
 class TagVars {
     /**
      *
@@ -41,7 +42,7 @@ class TagArea extends WorldData {
             this.tagVarsArr.forEach((tagVars, i) => {
                 if (CollisionFunctions.insideBox(player.location, tagVars.startLoc, tagVars.endLoc, true, "minecraft:basic_flame_particle")) {
                     if (DebugOptions.debug) {
-                        HudManager.addActionbarMessage(new ActionbarMessage(player, `DEBUG - In area ${i} with Tag ${tagVars.tag}`, 5));
+                        addActionbarMessage({ player: player, message: `DEBUG - In area ${i} with Tag ${tagVars.tag}`, lifetime: 5 });
                     }
                     player.addTag(tagVars.tag);
                     tags.delete(tagVars.tag);
