@@ -233,6 +233,8 @@ const fusePoint = async (objective) => {
     for (const player of players) {
         if (CollisionFunctions.insideSphere(player.location, fuseSpawn.location, fuseRange, true)) {
             player.getComponent("inventory").container.addItem(fuseItem);
+            //Choose a new fuse spawn
+            //to-do make it not spawn duplicate fuses at the same spot back to back (Also warn the user if theres also one fuse spawn in range)
             const fuseSpawnRange = Number(objective.getDynamicProperty("fuseSpawnRange"));
             let fuseSpawns = objective.dimension.getEntities({ maxDistance: fuseSpawnRange, location: objective.location, type: "stikphg:fuse_spawn" });
             if (fuseSpawns.length == 0) {
