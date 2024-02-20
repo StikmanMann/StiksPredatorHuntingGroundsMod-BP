@@ -156,11 +156,15 @@ const nextObjective = () => {
                 break;
             }
             objectiveFinish = (Number(newObjective.getDynamicProperty("objectiveFinish")) * standardObjectiveFinishMultiplier) / (survivorBuff + 1);
-            world.sendMessage(`setting up fuse ${objectiveFinish} but also this ${newObjective.getDynamicProperty("objectiveFinish")}`);
             captureRange = Number(newObjective.getDynamicProperty("captureRange"));
             fuseSpawn = fuseSpawns[Math.floor(Math.random() * fuseSpawns.length)];
             break;
     }
+    if (isNaN(objectiveFinish)) {
+        world.sendMessage("Objective finish is not a number (try setting the objectiveFinish property to a number since it could be it didn't register correctly on spawn) \nSwitching to next objective");
+        nextObjective();
+    }
+    world.sendMessage(`Time to complete objective: ${objectiveFinish.toFixed(2)} seconds`);
 };
 function escapeObjective() {
     const extractPoints = GlobalVars.overworld.getEntities({ type: "stikphg:extract_point" });
