@@ -2,7 +2,6 @@ import { Player, system, world } from "@minecraft/server";
 import { GlobalVars } from "../globalVars";
 import { TickFunctions } from "../staticScripts/tickFunctions";
 import { VectorFunctions } from "../staticScripts/vectorFunctions";
-import { ActionbarMessage, HudManager } from "../hud";
 
 
 declare module "@minecraft/server" {

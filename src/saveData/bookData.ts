@@ -82,7 +82,7 @@ class BookData {
                     //console.warn(`Book - Trying to access block at ${VectorFunctions.vectorToString(chestLocation)}`);
                     if (BookData.overworld.getBlock(chestLocation)) {
                         //console.warn(`Success to access block at ${VectorFunctions.vectorToString(chestLocation)}`);
-                        resolve();
+                        resolve(null);
                         system.clearRun(worldLoad);
                     }
                 } catch {

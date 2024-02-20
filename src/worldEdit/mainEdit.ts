@@ -1,7 +1,7 @@
-import { world, system, ItemStack,  EntityInventoryComponent,  ItemTypes,  ItemEnchantsComponent, Enchantment, BlockTypes, Dimension, Vector3 } from "@minecraft/server";
+import { world, system, ItemStack,  EntityInventoryComponent,  ItemTypes,  Enchantment, BlockTypes, Dimension, Vector3 } from "@minecraft/server";
 import { ActionFormData, ActionFormResponse, ModalFormData } from "@minecraft/server-ui";
 import {set, undo, redo, copy, paste} from "./commands";
-import { ActionbarMessage, HudManager } from "../hud.js";
+
 
 export {getPlayerObject}
 
@@ -13,6 +13,7 @@ console.warn("playerCODESS");
 
 import { setUi } from "./set.js"
 import { replaceUi } from "./replace.js"
+import { addActionbarMessage } from "hud";
 
 
 
@@ -350,11 +351,7 @@ function undoAdd(block, affectedBlocks, playerInstance, i){
                         const wand = new ItemStack(ItemTypes.get("minecraft:wooden_axe"), 1)
                         wand.nameTag = "§dWand"
                         wand.setLore(["I hope your happy alivejy :D","+10 coolness"])
-                        /**
-                         * @type {ItemEnchantsComponent}
-                         */
-                        let enchants = wand.getComponent("enchantments")
-                        enchants.enchantments.addEnchantment(new Enchantment("unbreaking", 3))
+
                         /**
                          * @type {EntityInventoryComponent}
                          */
@@ -480,7 +477,7 @@ system.runInterval(()=>{
             const playerInstance = activePlayers.get(player.name);
             playerInstance.tSLT++;
             const block = player.getBlockFromViewDirection().block;
-            HudManager.addActionbarMessage(new ActionbarMessage(player, `§d${block.typeId} at x: ${block.location.x}  y: ${block.location.y}  z: ${block.location.z}`, 1))
+            addActionbarMessage({player: player, message: `§d${block.typeId} at x: ${block.location.x}  y: ${block.location.y}  z: ${block.location.z}`, lifetime: 1})
             /**
              * @type {EntityInventoryComponent}
              */

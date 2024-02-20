@@ -8,9 +8,9 @@ import { VectorFunctions } from "./staticScripts/vectorFunctions";
 import { DataType, GlobalVars } from "./globalVars";
 import { TickFunctions } from "./staticScripts/tickFunctions";
 import { ChestData } from "./saveData/chestData"
-import { DebugOptions } from "./debugging/debugCommands";
-import { ActionbarMessage, HudManager } from "./hud";
+import { DebugOptions } from "./debugging/debugCommands";;
 import {  WorldData } from "saveData/worldData";
+import { addActionbarMessage } from "hud";
 
 class TagVars{
     /**
@@ -79,7 +79,7 @@ class TagArea extends WorldData{
             let tags = new Set(player.getTags());  
             this.tagVarsArr.forEach((tagVars, i) => {
                 if(CollisionFunctions.insideBox(player.location, tagVars.startLoc, tagVars.endLoc, true, "minecraft:basic_flame_particle")){   
-                    if(DebugOptions.debug){HudManager.addActionbarMessage(new ActionbarMessage(player, `DEBUG - In area ${i} with Tag ${tagVars.tag}`, 5))}
+                    if(DebugOptions.debug){addActionbarMessage({player: player, message: `DEBUG - In area ${i} with Tag ${tagVars.tag}`, lifetime: 5})}
                     player.addTag(tagVars.tag);
                     tags.delete(tagVars.tag);
                 }
