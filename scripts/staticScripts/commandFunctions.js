@@ -13,6 +13,12 @@ export function addCommand(commandValue) {
 }
 world.beforeEvents.chatSend.subscribe((event) => {
     const sender = event.sender;
+    if (event.message.startsWith(";;help")) {
+        for (const cmd of commandValues) {
+            sender.sendMessage(cmd.commandPrefix + cmd.commandName);
+        }
+        return;
+    }
     // Iterate through registered commands
     for (const cmd of commandValues) {
         const commandString = `${cmd.commandPrefix}${cmd.commandName}`;

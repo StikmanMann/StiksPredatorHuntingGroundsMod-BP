@@ -21,7 +21,7 @@ TickFunctions.addFunction(() => {
             overworld.getEntities({ families: ["gameEntitiy"] }).forEach(entity => {
                 entity.getComponent(EntityComponentTypes.Health).setCurrentValue(999);
                 entity.addEffect(EffectTypes.get("invisibility"), 9999999, { showParticles: false });
-                entity.addEffect(EffectTypes.get("resistance"), 9999999, { showParticles: true, amplifier: 255 });
+                entity.addEffect(EffectTypes.get("resistance"), 9999999, { showParticles: false, amplifier: 255 });
             });
         }
         if (!preLobby) {
