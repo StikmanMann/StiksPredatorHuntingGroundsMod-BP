@@ -1,4 +1,4 @@
-import { system, world } from "@minecraft/server";
+import { EffectTypes, EntityComponentTypes, system, world } from "@minecraft/server";
 import { GlobalVars } from "globalVars";
 import { TickFunctions } from "staticScripts/tickFunctions";
 import { EGameVarId, getGameVarData } from "./gameVars";
@@ -6,8 +6,24 @@ import { preLobby, predators, setMidGame, setPreLobby, setSurvivorBuff, survivor
 import { startObjectives } from "./gameObjectives";
 import { givePredatorKit } from "./predator";
 import { giveSurvivorKit } from "./survivour";
+const overworld = GlobalVars.overworld;
 TickFunctions.addFunction(() => {
     system.run(async () => {
+        if (getGameVarData(EGameVarId.editingMode) !== "0") {
+            overworld.getEntities({ families: ["gameEntitiy"] }).forEach(entity => {
+                entity.getComponent(EntityComponentTypes.Health).setCurrentValue(1);
+                entity.removeEffect(EffectTypes.get("invisibility"));
+                entity.removeEffect(EffectTypes.get("resistance"));
+            });
+            return;
+        }
+        else {
+            overworld.getEntities({ families: ["gameEntitiy"] }).forEach(entity => {
+                entity.getComponent(EntityComponentTypes.Health).setCurrentValue(999);
+                entity.addEffect(EffectTypes.get("invisibility"), 9999999, { showParticles: false });
+                entity.addEffect(EffectTypes.get("resistance"), 9999999, { showParticles: true, amplifier: 255 });
+            });
+        }
         if (!preLobby) {
             return;
         }

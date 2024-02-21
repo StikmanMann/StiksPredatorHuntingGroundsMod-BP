@@ -9,7 +9,6 @@ export function addCommand(commandValue) {
     if (!commandValue.directory.endsWith("/")) {
         commandValue.directory = commandValue.directory.concat("/");
     }
-    //commandValue.chatFunction(); // Just testing
     commandValues.push(commandValue);
 }
 world.beforeEvents.chatSend.subscribe((event) => {
@@ -18,21 +17,21 @@ world.beforeEvents.chatSend.subscribe((event) => {
     for (const cmd of commandValues) {
         const commandString = `${cmd.commandPrefix}${cmd.commandName}`;
         // Check if the message starts with the command string
-        if (event.message.startsWith(commandString)) {
+        if (!event.message.startsWith(commandString)) {
             // Check player tags
-            if (!cmd.permissions) {
-                system.run(async () => { cmd.chatFunction(event); });
-                break;
-            }
-            if (cmd.permissions.some((tag) => sender.hasTag(tag))) {
-                // Execute the command function
-                system.run(async () => { cmd.chatFunction(event); });
-                break;
-            }
-            // Player doesn't have the required tags
-            event.cancel = true;
-            sender.sendMessage("You don't have the required tags to use this command.");
+            continue;
         }
+        if (!cmd.permissions) {
+            system.run(async () => { cmd.chatFunction(event); });
+            break;
+        }
+        if (cmd.permissions.some((tag) => sender.hasTag(tag))) {
+            // Execute the command function
+            system.run(async () => { cmd.chatFunction(event); });
+            break;
+        }
+        event.cancel = true;
+        sender.sendMessage("You don't have the required tags to use this command.");
     }
 });
 function generateForm(parentPath, player) {

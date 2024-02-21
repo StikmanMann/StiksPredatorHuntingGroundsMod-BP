@@ -5,6 +5,7 @@ import { WorldData } from "saveData/worldData";
 import { addCommand, showHUD } from "staticScripts/commandFunctions";
 const worldSpawn = world.getDefaultSpawnLocation();
 let gameVars = [
+    { varName: "editingMode", dataType: DataType.boolean, data: "1", tooltip: "0 = off, otherwise on" },
     { varName: "predatorSprint", dataType: DataType.vector, data: "10 1.5 2", tooltip: "max stamina, sprint multiplier, stamina regen rate" },
     { varName: "survivorSprint", dataType: DataType.vector, data: "10 1.5 1.5", tooltip: "max stamina, sprint multiplier, stamina regen rate" },
     { varName: "playersNeeded", dataType: DataType.number, data: "2" },
@@ -13,11 +14,12 @@ let gameVars = [
 ];
 export var EGameVarId;
 (function (EGameVarId) {
-    EGameVarId[EGameVarId["predatorSprint"] = 0] = "predatorSprint";
-    EGameVarId[EGameVarId["survivorSprint"] = 1] = "survivorSprint";
-    EGameVarId[EGameVarId["playersNeeded"] = 2] = "playersNeeded";
-    EGameVarId[EGameVarId["numberOfPredators"] = 3] = "numberOfPredators";
-    EGameVarId[EGameVarId["standardObjectiveFinishMultiplier"] = 4] = "standardObjectiveFinishMultiplier";
+    EGameVarId[EGameVarId["editingMode"] = 0] = "editingMode";
+    EGameVarId[EGameVarId["predatorSprint"] = 1] = "predatorSprint";
+    EGameVarId[EGameVarId["survivorSprint"] = 2] = "survivorSprint";
+    EGameVarId[EGameVarId["playersNeeded"] = 3] = "playersNeeded";
+    EGameVarId[EGameVarId["numberOfPredators"] = 4] = "numberOfPredators";
+    EGameVarId[EGameVarId["standardObjectiveFinishMultiplier"] = 5] = "standardObjectiveFinishMultiplier";
 })(EGameVarId || (EGameVarId = {}));
 export function getGameVarData(gameVar) {
     return gameVars[gameVar].data;
