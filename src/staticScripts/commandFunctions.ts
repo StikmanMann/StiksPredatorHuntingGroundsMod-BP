@@ -39,7 +39,6 @@ export interface CommandValues{
     
 }
 
-
 let commandValues : CommandValues[] = []
 
 
@@ -54,42 +53,37 @@ export function addCommand(commandValue: CommandValues) {
     commandValue.directory = commandValue.directory.concat("/")
   }
 
+  commandValues.push(commandValue);   
+}
 
-  //commandValue.chatFunction(); // Just testing
-    commandValues.push(commandValue);
-    
-  }
-
-  world.beforeEvents.chatSend.subscribe((event) => {
+world.beforeEvents.chatSend.subscribe((event) => {
       
-    const sender = event.sender as Player;
+  const sender = event.sender as Player;
 
     // Iterate through registered commands
-    for (const cmd of commandValues) {
-      const commandString = `${cmd.commandPrefix}${cmd.commandName}`;
+  for (const cmd of commandValues) {
+    const commandString = `${cmd.commandPrefix}${cmd.commandName}`;
 
-      // Check if the message starts with the command string
-      if (event.message.startsWith(commandString)) {
-        // Check player tags
-        
-        if(!cmd.permissions){
-          system.run(async () => {cmd.chatFunction(event)});
-          break;
-        }
-
-        if (cmd.permissions.some((tag) => sender.hasTag(tag))) {
-          // Execute the command function
-          system.run(async () => {cmd.chatFunction(event)});
-          break;
-        }
-          // Player doesn't have the required tags
-        event.cancel = true;
-        sender.sendMessage("You don't have the required tags to use this command.");
-        
-        
-      }
+    // Check if the message starts with the command string
+    if (!event.message.startsWith(commandString)) {
+      // Check player tags
+      continue;
     }
-  });
+    if(!cmd.permissions){
+      system.run(async () => {cmd.chatFunction(event)});
+      break;
+    }
+
+    if (cmd.permissions.some((tag) => sender.hasTag(tag))) {
+      // Execute the command function
+      system.run(async () => {cmd.chatFunction(event)});
+      break;
+    }
+      
+    event.cancel = true;
+    sender.sendMessage("You don't have the required tags to use this command.");  
+  }
+});
 
   
   function generateForm(parentPath: string, player: Player): ActionFormData {
