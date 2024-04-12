@@ -57,7 +57,7 @@ export function addCommand(commandValue: CommandValues) {
 }
 
 world.beforeEvents.chatSend.subscribe((event) => {
-      
+  
   const sender = event.sender as Player;
   if(event.message.startsWith(";;help")){
     for(const cmd of commandValues){

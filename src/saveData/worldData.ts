@@ -2,8 +2,9 @@ import { world, system, Player, ItemTypes, ItemStack, DisplaySlotId, ObjectiveSo
 import { VectorFunctions } from "../staticScripts/vectorFunctions";
 import { Logger, LoggerClass } from '../staticScripts/Logger';
 import { addCommand , CommandValues, showHUD} from 'staticScripts/commandFunctions';
-import {  DataType, GlobalVars } from '../globalVars';
+import {  GlobalVars } from '../globalVars';
 import { ActionFormData, ActionFormResponse, ModalFormData, ModalFormResponse } from '@minecraft/server-ui';
+import { DataType } from 'dataTypes/dataTypeHud';
 export {WorldData}
 
 

@@ -3,15 +3,14 @@
 	"metadata": {
 		"authors": ["StikmanMann", "CoderReal"],
 		"generated_with": {
-			"bridge": ["1.8.5"],
 			"blockbench_item_wizard": ["1.0.2"]
 		}
 	},
 	"header": {
 		"name": "SPHGMod",
-		"description": "Mod by StikmanMann and CoderReal and hopefuilly i swear",
+		"description": "Mod by StikmanMann and CoderReal and hopefuilly i 1.20d",
 		"min_engine_version": [1, 19, 50],
-		"uuid": "9b34fd8e-6f89-4c8a-8c69-fcbbf443e2dc",
+		"uuid": "1e5fedb5-7a6c-4934-83bf-c1dd21d4f1ee",
 		"version": [1, 0, 0]
 	},
 	"modules": [
@@ -31,7 +30,7 @@
 	"dependencies": [
 		{
 			"module_name": "@minecraft/server",
-			"version": "1.9.0-beta"
+			"version": "1.10.0-beta"
 		},
 		{
 			"module_name": "@minecraft/server-ui",

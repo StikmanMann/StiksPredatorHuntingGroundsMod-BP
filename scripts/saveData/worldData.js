@@ -13,8 +13,8 @@ var _WorldData_saveId;
 import { world, system, DisplaySlotId, ObjectiveSortOrder } from '@minecraft/server';
 import { Logger, LoggerClass } from '../staticScripts/Logger';
 import { addCommand, showHUD } from 'staticScripts/commandFunctions';
-import { DataType } from '../globalVars';
 import { ActionFormData, ModalFormData } from '@minecraft/server-ui';
+import { DataType } from 'dataTypes/dataTypeHud';
 export { WorldData };
 class WorldData {
     get scoreboardName() {

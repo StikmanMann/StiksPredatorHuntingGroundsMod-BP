@@ -1,0 +1,30 @@
+{
+	"format_version": "1.20.30",
+	"minecraft:item": {
+		"description": {
+			"identifier": "stikphg:gun"
+		},
+		"components": {
+			"minecraft:display_name": {
+				"value": "crack cola"
+			},
+			"minecraft:icon": {
+				"texture": "healing_syringe"
+			},
+			"minecraft:use_duration": 0.5,
+			"minecraft:throwable": {
+				"do_swing_animation": false,
+				"launch_power_scale": 1,
+				"max_launch_power": 3
+			},
+			"minecraft:projectile": {
+				"minimum_critical_power": 1.25,
+				"projectile_entity": "arrow"
+			}
+			
+
+
+			
+		}
+	}
+}
