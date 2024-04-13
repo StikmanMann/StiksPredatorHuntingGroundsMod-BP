@@ -21,10 +21,10 @@ import "./playerMovement/sprint"
 import "./staticScripts/commandFunctions"
 import "./gameManager/gameMain"
 import { Logger } from './staticScripts/Logger';
-
+//import fs from "fs"
 //import "C:/Users/flori/AppData/Local/ Packages/Microsoft.MinecraftUWP_8wekyb3d8bbwe/LocalState/games/com.mojang/development_behavior_packs/test BP/scripts/main" // world Edit :D
 
-
+//fs.writeFile("C:/Users/flori/AppData/Local/Temp/STIKS.LOG", "w", (err) => {if (err) throw err;})
 world.sendMessage("If you jsut startetd the world up, pelase type /retry")
 export {getPlayerObject}
 //import * as ui from '@minecraft/server-ui';

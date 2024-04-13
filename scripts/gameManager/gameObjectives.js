@@ -1,5 +1,5 @@
 import { ItemStack, ItemTypes, system, world } from "@minecraft/server";
-import { DataType, GlobalVars } from "globalVars";
+import { GlobalVars } from "globalVars";
 import { currentObjective, setCurrentObjective, survivorBuff, survivors } from "./privateGameVars";
 import { CollisionFunctions } from "staticScripts/collisionFunctions";
 import { TickFunctions } from "staticScripts/tickFunctions";
@@ -11,6 +11,7 @@ import { ModalFormData } from "@minecraft/server-ui";
 import { showHUD } from "staticScripts/commandFunctions";
 import { spawnRandomEntities } from "staticScripts/entitiesFunctions";
 import { addActionbarMessage } from "hud";
+import { DataType } from "dataTypes/dataTypeHud";
 const overworld = GlobalVars.overworld;
 /**This number goes from 0 to a 100 */
 let objectiveProgress = 0;

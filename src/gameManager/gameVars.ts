@@ -1,6 +1,6 @@
 import { ChatSendBeforeEvent, world } from "@minecraft/server";
 import { ActionFormData, ActionFormResponse, ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
-import { DataType, GlobalVars } from "globalVars";
+import { DataType } from "dataTypes/dataTypeHud";
 import { AddDataValues, WorldData } from "saveData/worldData";
 import { Logger } from "staticScripts/Logger";
 import { addCommand, showHUD } from "staticScripts/commandFunctions";

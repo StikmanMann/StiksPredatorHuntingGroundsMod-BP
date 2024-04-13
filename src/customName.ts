@@ -1,4 +1,4 @@
-import {world, system, Player, BlockPermutation, Block, Container, BlockInventoryComponent, ItemStack, ItemTypes, Vector} from '@minecraft/server';
+import {world, system, Player, BlockPermutation, Block, Container, BlockInventoryComponent, ItemStack, ItemTypes} from '@minecraft/server';
 import { BookData } from "./saveData/bookData";
 import { ScoreboardFunctions } from './staticScripts/scoreboardFunctions';
 export {customName}

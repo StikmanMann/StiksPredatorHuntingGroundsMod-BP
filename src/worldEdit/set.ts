@@ -28,7 +28,7 @@ async function setUi(player) {
     var resultBlockChoose;
     var searchResult = [];
     var overallPercent = 0;
-    for (var i = 0; i < resultRange.formValues[0] && overallPercent < 100; i++) {
+    for (var i = 0; i < Number(resultRange.formValues[0]) && overallPercent < 100; i++) {
         var percent;
         do {
             searchResult = [];
@@ -47,7 +47,7 @@ async function setUi(player) {
             const blockChoose = new ActionFormData()
                 .button("New Search");
             allBlocks.forEach(item => {
-                if (item.id.includes(result.formValues[0])) {
+                if (item.id.includes(result.formValues[0] as string)) {
                     searchResult[searchResult.length] = item.id;
                 }
             })

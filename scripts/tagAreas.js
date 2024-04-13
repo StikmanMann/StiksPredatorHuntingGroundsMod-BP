@@ -4,12 +4,13 @@ import { MolangVariableMap, system, world } from "@minecraft/server";
 import { Logger } from "./staticScripts/Logger";
 import { AwaitFunctions } from "./staticScripts/awaitFunctions";
 import { CollisionFunctions } from "./staticScripts/collisionFunctions";
-import { DataType, GlobalVars } from "./globalVars";
+import { GlobalVars } from "./globalVars";
 import { TickFunctions } from "./staticScripts/tickFunctions";
 import { DebugOptions } from "./debugging/debugCommands";
 ;
 import { WorldData } from "saveData/worldData";
 import { addActionbarMessage } from "hud";
+import { DataType } from "dataTypes/dataTypeHud";
 class TagVars {
     /**
      *

@@ -1,5 +1,5 @@
-import { Entity, EntitySpawnAfterEvent, ItemStack, ItemTypes, Player, Vector, system, world } from "@minecraft/server";
-import { DataType, GlobalVars } from "globalVars";
+import { Entity, EntitySpawnAfterEvent, ItemStack, ItemTypes, Player, system, world } from "@minecraft/server";
+import { GlobalVars } from "globalVars";
 import { AddDataValues, WorldData } from "saveData/worldData";
 import { currentObjective, setCurrentObjective, survivorBuff, survivors } from "./privateGameVars";
 import { CollisionFunctions } from "staticScripts/collisionFunctions";
@@ -12,6 +12,7 @@ import { ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
 import { showHUD } from "staticScripts/commandFunctions";
 import { spawnRandomEntities } from "staticScripts/entitiesFunctions";
 import { addActionbarMessage } from "hud";
+import { DataType } from "dataTypes/dataTypeHud";
 
 const overworld = GlobalVars.overworld;
 

@@ -1,5 +1,6 @@
 import { system, world, Player } from "@minecraft/server";
-import { DataType, GlobalVars } from "globalVars";
+import { DataType } from "dataTypes/dataTypeHud";
+import { GlobalVars } from "globalVars";
 import { WorldData } from "saveData/worldData";
 import { TickFunctions } from "staticScripts/tickFunctions";
 export { SprintClass };
@@ -37,10 +38,13 @@ Object.defineProperties(Player.prototype, {
         }
     }
 });
+world.afterEvents.dataDrivenEntityTrigger.subscribe((event) => {
+});
 TickFunctions.addFunction(() => {
     const players = GlobalVars.players;
     const playerMovementMap = SprintClass.movementComponentMap;
     players.forEach((player, index) => {
+        player.startItemCooldown("chorus_fruit", 2);
         let playerMovement = playerMovementMap.get(player);
         if (player.isSprinting) {
             player.stamina--;

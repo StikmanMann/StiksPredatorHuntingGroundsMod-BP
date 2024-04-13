@@ -1,5 +1,6 @@
 import { world, Player, Dimension } from "@minecraft/server"
 export {GlobalVars}
+
 class GlobalVars{
     /**
      * @type {Player[]}

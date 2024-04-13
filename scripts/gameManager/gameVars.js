@@ -1,6 +1,6 @@
 import { world } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
-import { DataType } from "globalVars";
+import { DataType } from "dataTypes/dataTypeHud";
 import { WorldData } from "saveData/worldData";
 import { addCommand, showHUD } from "staticScripts/commandFunctions";
 const worldSpawn = world.getDefaultSpawnLocation();
