@@ -1,8 +1,23 @@
-import { world, system } from '@minecraft/server';
+import { world, system, ItemStack, EnchantmentTypes, EquipmentSlot } from '@minecraft/server';
 import { GlobalVars } from 'globalVars';
 import { addCommand, showHUD } from 'staticScripts/commandFunctions';
 import { ModalFormData } from '@minecraft/server-ui';
+let iron_sword = new ItemStack(("iron_sword"));
 const cmdPrefixes = [";;", "!!", ";", "!"];
+system.runInterval(() => {
+    const players = world.getAllPlayers();
+    for (const player of players) {
+        const item_components = player.getComponent("inventory").container.getItem(player.selectedSlot).getTags();
+        for (const component of item_components) {
+            player.sendMessage(component);
+        }
+    }
+}, 20);
+const sharpness = EnchantmentTypes.get("sharpness");
+const bow = new ItemStack("bow");
+let leather_helmet = new ItemStack("leather_helmet");
+world.getAllPlayers()[0].getComponent("equippable").setEquipment(EquipmentSlot.Mainhand, bow);
+bow.getComponent("enchantable").addEnchantment({ level: 1, type: sharpness });
 function isValueInRange(value, minValue, maxValue) {
     return value >= minValue && value <= maxValue;
 }

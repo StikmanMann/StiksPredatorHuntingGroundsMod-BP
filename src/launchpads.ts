@@ -9,6 +9,7 @@ import { GlobalVars } from "./globalVars";
 import { TickFunctions } from "./staticScripts/tickFunctions";
 import { DebugOptions } from "./debugging/debugCommands";
 import { addActionbarMessage } from "hud";
+import { showHUD } from "staticScripts/commandFunctions";
 
 class LaunchpadVars{
     /**
@@ -131,7 +132,7 @@ const commandPrefix = ";;"
 
 world.afterEvents.buttonPush.subscribe(async (eventData) => {
     
-    const formResult = await Launchpad.gui.show(eventData.source as Player) //Apparently an entity can also push buttons but lol
+    const formResult = await showHUD(eventData.source as Player, Launchpad.gui); //Apparently an entity can also push buttons but lol
     Logger.log("Form Recived!", "Form")
     if(formResult.canceled) {Logger.log(formResult.cancelationReason, "Form Canceled");return}
     Logger.log("Form Not Canceled", "Form")
@@ -162,11 +163,11 @@ world.beforeEvents.chatSend.subscribe((eventData) => {
                 /**
                 * @type {ModalFormResponse}
                 */
-                let formResult
+                
                 if(msgSplit.length == 1){
                     let attempts = 0;
                     player.sendMessage("Please close Chat to make the GUI appear!")
-                    do{formResult = await Launchpad.gui.show(player); attempts++;await AwaitFunctions.waitTicks(5); Logger.log(formResult.cancelationReason, "Form Canceled")} while(attempts<10 && formResult.cancelationReason == "UserBusy");
+                    var formResult = await showHUD(player, Launchpad.gui);
                     if(formResult.canceled) {return;}
 
                     Logger.log("Form Recived!", "Form")

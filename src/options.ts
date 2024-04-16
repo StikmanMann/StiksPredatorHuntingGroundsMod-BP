@@ -3,6 +3,7 @@ import { BookData } from "./saveData/bookData";
 import { MolangVariableMap, Player, system, world } from "@minecraft/server";
 import { AwaitFunctions } from "./staticScripts/awaitFunctions";
 import { Logger } from "./staticScripts/Logger";
+import { showHUD } from "staticScripts/commandFunctions";
 
 const commandPrefix = "!"
 
@@ -26,13 +27,12 @@ world.beforeEvents.chatSend.subscribe((eventData) => {
                 /**
                 * @type {ModalFormResponse}
                 */
-                let formResult
                 let newGui = new ModalFormData()
                 .title("Options")
                 .toggle("Wall Jumps", player.hasTag("wallJump"))
                 let attempts = 0;
                 player.sendMessage("Please close Chat to make the GUI appear!")
-                do{formResult = await newGui.show(player); attempts++;await AwaitFunctions.waitTicks(5); Logger.log(formResult.cancelationReason, "Form Canceled")} while(attempts<10 && formResult.cancelationReason == "UserBusy");
+                let formResult = await showHUD(player, newGui);
                 if(formResult.canceled) {return;}
 
                 if(formResult.formValues[0]){

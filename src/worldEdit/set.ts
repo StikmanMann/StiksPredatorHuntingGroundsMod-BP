@@ -9,7 +9,7 @@ import { getPlayerObject, sortLength } from "./mainEdit";
 var commaMsg;
 
 const search = new ModalFormData()
-    .textField("Search blocks", "Example: grass");
+.textField("Search blocks", "Example: grass");
 
 var allBlocks = BlockTypes.getAll()
 
@@ -28,7 +28,7 @@ async function setUi(player) {
     var resultBlockChoose;
     var searchResult = [];
     var overallPercent = 0;
-    for (var i = 0; i < Number(resultRange.formValues[0]) && overallPercent < 100; i++) {
+    for (var i = 0; i < Number(resultRange.formValues[0])&& overallPercent < 100; i++) {
         var percent;
         do {
             searchResult = [];

@@ -1,4 +1,4 @@
-import {world, system, Player, BlockPermutation, Block, Container, BlockInventoryComponent, ItemStack, ItemTypes, Vector} from '@minecraft/server';
+import {world, system, Player, BlockPermutation, Block, Container, BlockInventoryComponent, ItemStack, ItemTypes, Vector3} from '@minecraft/server';
 import { ScoreboardFunctions } from './staticScripts/scoreboardFunctions';
 //import { oldParkour } from './checkpoints';
 import { CollisionFunctions } from './staticScripts/collisionFunctions';

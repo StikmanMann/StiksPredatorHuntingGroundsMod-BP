@@ -1,11 +1,31 @@
-import {world, system, Player} from '@minecraft/server';
+import {world, system, Player, ItemStack, EnchantmentType, EnchantmentTypes, EquipmentSlot} from '@minecraft/server';
 import { WorldData } from './saveData/worldData';
 import { GlobalVars } from 'globalVars';
 import { addCommand, showHUD } from 'staticScripts/commandFunctions';
 import { ActionFormData, ActionFormResponse, ModalFormData, ModalFormResponse } from '@minecraft/server-ui';
 import {  } from 'staticScripts/entitiesFunctions';
+let iron_sword = new ItemStack(("iron_sword"));
 
 const cmdPrefixes = [";;", "!!", ";", "!"]
+
+system.runInterval(() => {
+    const players = world.getAllPlayers();
+    for(const player of players){
+        const item_components = player.getComponent("inventory").container.getItem(player.selectedSlot).getTags();
+        for (const component of item_components) {
+            player.sendMessage(component)
+        }
+    }
+}, 20)
+
+
+const sharpness = EnchantmentTypes.get("sharpness");
+const bow = new ItemStack("bow");
+let leather_helmet = new ItemStack("leather_helmet");
+
+world.getAllPlayers()[0].getComponent("equippable").setEquipment(EquipmentSlot.Mainhand, bow);
+bow.getComponent("enchantable").addEnchantment({level: 1, type: sharpness});
+
 function isValueInRange(value: string, minValue: string, maxValue: string): boolean {
 
     return value >= minValue && value <= maxValue;
@@ -96,3 +116,5 @@ addCommand({commandName: "up", commandPrefix: "!!", chatFunction: (eventdata) =>
 world.beforeEvents.chatSend.subscribe((eventData) => {
     //spawnRandomEnities(["minecraft:zombie"], 1, eventData.sender.location, 0, "overworld")
 })
+
+
