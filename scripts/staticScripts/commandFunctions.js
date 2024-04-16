@@ -95,7 +95,7 @@ world.beforeEvents.chatSend.subscribe((event) => {
         commandHud(event.sender, event, "/");
     }
 });
-export async function showHUD(player, form, attempts) {
+export async function showHUD(player, form, attempts = 10) {
     return new Promise(async (resolve) => {
         let response;
         let attempt = 0;

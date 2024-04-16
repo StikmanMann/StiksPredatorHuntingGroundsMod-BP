@@ -14,13 +14,13 @@ import { ModalFormData } from "@minecraft/server-ui";
 import { BookData } from "./saveData/bookData";
 import { MolangVariableMap, system, world } from "@minecraft/server";
 import { Logger } from "./staticScripts/Logger";
-import { AwaitFunctions } from "./staticScripts/awaitFunctions";
 import { CollisionFunctions } from "./staticScripts/collisionFunctions";
 import { VectorFunctions } from "./staticScripts/vectorFunctions";
 import { GlobalVars } from "./globalVars";
 import { TickFunctions } from "./staticScripts/tickFunctions";
 import { DebugOptions } from "./debugging/debugCommands";
 import { addActionbarMessage } from "hud";
+import { showHUD } from "staticScripts/commandFunctions";
 class LaunchpadVars {
     /**
      *
@@ -99,7 +99,7 @@ Launchpad.expectedValues = 9;
 let launchpads = new Launchpad({ x: 0, y: -60, z: 0 }, 2);
 const commandPrefix = ";;";
 world.afterEvents.buttonPush.subscribe(async (eventData) => {
-    const formResult = await Launchpad.gui.show(eventData.source); //Apparently an entity can also push buttons but lol
+    const formResult = await showHUD(eventData.source, Launchpad.gui); //Apparently an entity can also push buttons but lol
     Logger.log("Form Recived!", "Form");
     if (formResult.canceled) {
         Logger.log(formResult.cancelationReason, "Form Canceled");
@@ -135,16 +135,10 @@ world.beforeEvents.chatSend.subscribe((eventData) => {
                 /**
                 * @type {ModalFormResponse}
                 */
-                let formResult;
                 if (msgSplit.length == 1) {
                     let attempts = 0;
                     player.sendMessage("Please close Chat to make the GUI appear!");
-                    do {
-                        formResult = await Launchpad.gui.show(player);
-                        attempts++;
-                        await AwaitFunctions.waitTicks(5);
-                        Logger.log(formResult.cancelationReason, "Form Canceled");
-                    } while (attempts < 10 && formResult.cancelationReason == "UserBusy");
+                    var formResult = await showHUD(player, Launchpad.gui);
                     if (formResult.canceled) {
                         return;
                     }

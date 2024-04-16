@@ -1,16 +1,16 @@
 import { world, system, ItemStack, ItemTypes, BlockTypes } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { set, undo, redo, copy, paste } from "./commands";
-export { getPlayerObject };
-function getPlayerObject(player) {
+import { setUi } from "./set.js";
+import { replaceBlocks, replaceUi } from "./replace.js";
+import { addActionbarMessage } from "hud";
+import { showHUD } from "staticScripts/commandFunctions";
+const commandPrefix = ";";
+/**Gets the player object of a player */
+export function getPlayerObject(player) {
     return activePlayers.get(player.name);
 }
-console.warn("playerCODESS");
-import { setUi } from "./set.js";
-import { replaceUi } from "./replace.js";
-import { addActionbarMessage } from "hud";
-const commandPrefix = ";";
-class PlayerClass {
+export class PlayerClass {
     constructor(playerName) {
         /**
          * @type {String}
@@ -24,19 +24,8 @@ class PlayerClass {
          * @type {String[]}
          */
         this.paintReplace = [];
+        this.blockArray = new Array(20);
         this.paintRange = 0;
-        /**
-         * @type {import("@minecraft/server").BlockPermutation[][]}
-         */
-        this.blockArray = [[], [], [], [], [], [], [], [], []];
-        /**
-        * @type {import("@minecraft/server").Vector3[][]}
-        */
-        this.bL = [[], [], [], [], [], [], [], [], []];
-        /**
-        * @type {number}
-        */
-        this.affectedBlocks = [];
         /**
          * @type {import("@minecraft/server").Vector3}
          */
@@ -113,12 +102,18 @@ const activePlayers = new Map();
  * @param {import("@minecraft/server").Block} block
  * @param {Number} blocksAffected
  * @param {PlayerClass} playerInstance
- */
-function undoAdd(block, affectedBlocks, playerInstance, i) {
+ *
+function undoAdd(block : Block, affectedBlocks: number, playerInstance: PlayerClass, i: number) {
     playerInstance.blockArray[playerInstance.index][i] = block.permutation;
     playerInstance.bL[playerInstance.index][i] = block.location;
     playerInstance.affectedBlocks[playerInstance.index] = affectedBlocks;
 }
+*/
+export const undoSave = (undoBlocks, playerInstance) => {
+    playerInstance.blockArray[playerInstance.index] = undoBlocks;
+    playerInstance.index += 1;
+    return;
+};
 //SET POS
 {
     world.beforeEvents.itemUse.subscribe(async (eventData) => {
@@ -146,7 +141,7 @@ function undoAdd(block, affectedBlocks, playerInstance, i) {
                     world.sendMessage(`§dSecond position set to ${block.location.x},  ${block.location.y},  ${block.location.z} (${blocksAffected})`);
                 }
                 else {
-                    const operationResult = await operation.show(player);
+                    const operationResult = await showHUD(player, operation);
                     switch (operationResult.selection) {
                         case 0:
                             setUi(player);
@@ -155,10 +150,10 @@ function undoAdd(block, affectedBlocks, playerInstance, i) {
                             replaceUi(player);
                             break;
                         case 2:
-                            copy(player);
+                            copy(getPlayerObject(player));
                             break;
                         case 3:
-                            paste(player);
+                            paste(getPlayerObject(player));
                     }
                 }
             }
@@ -287,6 +282,15 @@ function undoAdd(block, affectedBlocks, playerInstance, i) {
                         playerInstance.paintRange = Number(message.split(" ")[3]);
                         player.playSound("note.pling");
                         break;
+                    case ";replace":
+                        if (!player.hasTag("worldEdit")) {
+                            player.playSound("note.bass");
+                            player.sendMessage(`§dYou don't have permission to use this command!`);
+                            return;
+                        }
+                        replaceBlocks(message, playerInstance);
+                        player.playSound("note.pling");
+                        break;
                     default:
                         // player.playSound("note.bass")
                         //   player.sendMessage(`"${message.split(" ")[0]}" §d is not a valid command!`)
@@ -343,7 +347,7 @@ world.beforeEvents.itemUseOn.subscribe((eventData) => {
                                 //  world.sendMessage("" + percentMsgReplace.length)
                                 // world.sendMessage(`RNG: ${x} Contition <= ${(percentMsgReplace[i] + iCounterReplace)} and > ${iCounterReplace}`)
                                 if (x <= percentMsgReplace[i] + iCounterReplace && x >= iCounterReplace) {
-                                    undoAdd(offsetBlock, paintBlocksAffected, playerInstance, paintBlocksAffected);
+                                    //undoAdd(offsetBlock, paintBlocksAffected, playerInstance, paintBlocksAffected)
                                     paintBlocksAffected++;
                                     world.getDimension("overworld").fillBlocks(offsetBlock.location, offsetBlock.location, BlockTypes.get("minecraft:" + blockMsgReplace[i]));
                                 }
@@ -386,8 +390,7 @@ system.runInterval(() => {
     catch {
     }
 });
-export { sortLength };
-function sortLength(arr) {
+export function sortLength(arr) {
     if (arr.length <= 1) {
         return arr;
     }

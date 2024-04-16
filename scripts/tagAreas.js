@@ -2,7 +2,6 @@ var _a;
 import { ModalFormData } from "@minecraft/server-ui";
 import { MolangVariableMap, system, world } from "@minecraft/server";
 import { Logger } from "./staticScripts/Logger";
-import { AwaitFunctions } from "./staticScripts/awaitFunctions";
 import { CollisionFunctions } from "./staticScripts/collisionFunctions";
 import { GlobalVars } from "./globalVars";
 import { TickFunctions } from "./staticScripts/tickFunctions";
@@ -11,6 +10,7 @@ import { DebugOptions } from "./debugging/debugCommands";
 import { WorldData } from "saveData/worldData";
 import { addActionbarMessage } from "hud";
 import { DataType } from "dataTypes/dataTypeHud";
+import { showHUD } from "staticScripts/commandFunctions";
 class TagVars {
     /**
      *
@@ -110,16 +110,10 @@ world.beforeEvents.chatSend.subscribe((eventData) => {
                 /**
                 * @type {ModalFormResponse}
                 */
-                let formResult;
                 if (msgSplit.length == 1) {
                     let attempts = 0;
                     player.sendMessage("Please close Chat to make the GUI appear!");
-                    do {
-                        formResult = await TagArea.gui.show(player);
-                        attempts++;
-                        await AwaitFunctions.waitTicks(5);
-                        Logger.log(formResult.cancelationReason, "Form Canceled");
-                    } while (attempts < 10 && formResult.cancelationReason == "UserBusy");
+                    let formResult = await showHUD(player, TagArea.gui);
                     if (formResult.canceled) {
                         return;
                     }

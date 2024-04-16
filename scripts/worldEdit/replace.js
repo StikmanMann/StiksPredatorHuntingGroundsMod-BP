@@ -1,9 +1,12 @@
 import { world, BlockTypes } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
+import { sortLength, undoSave } from "./mainEdit";
+import { showHUD } from "staticScripts/commandFunctions";
 //import { undoBlocks, undoCounter, undoAdd, undoSave, bL1, bL2, deleteRow, sortLength, search, undoBlocksType } from "./mainFake.js"
 export { replaceUi };
-var blocksAffected;
 var allBlocks = BlockTypes.getAll();
+const search = new ModalFormData()
+    .textField("Search blocks", "Example: grass");
 /* world.events.beforeChat.subscribe((eventData) => {
     const player = eventData.sender;
     const msg = eventData.message;
@@ -18,49 +21,64 @@ var allBlocks = BlockTypes.getAll();
 * @param {string} replaceSettingsBlocks
 * @param {import("@minecraft/server").Player} player
 */
-function replaceBlocks(replaceSettings, replaceSettingsBlocks, player) {
-    var counter = 0;
+export function replaceBlocks(message, playerInstance) {
+    const bL1 = playerInstance.bL1;
+    const bL2 = playerInstance.bL2;
     try {
-        blocksAffected = (Math.abs(Math.abs(bL1.x) - Math.abs(bL2.x)) + 1) * (Math.abs(Math.abs(bL1.y) - Math.abs(bL2.y)) + 1) * (Math.abs(Math.abs(bL1.z) - Math.abs(bL2.z)) + 1);
+        var blocksAffected = (Math.abs(Math.abs(bL1.x) - Math.abs(bL2.x)) + 1) * (Math.abs(Math.abs(bL1.y) - Math.abs(bL2.y)) + 1) * (Math.abs(Math.abs(bL1.z) - Math.abs(bL2.z)) + 1);
+        var blockPermutations = new Array(blocksAffected);
+        var blockLocations = new Array(blocksAffected);
     }
     catch {
-        player.sendMessage("Operation couldn't be completed => Please have valid locations!");
+        world.sendMessage("Operation couldn't be completed => Please have valid locations!");
         return;
     }
-    player.sendMessage(`Operation completed (Blocks affected: ${blocksAffected})`);
-    const replaceBlockName = replaceSettings.split(",");
+    if (message.includes("replace")) {
+        var replaceBlocks = message.split(" ")[1];
+        var setBlocks = message.split(" ")[2];
+    }
+    else {
+        var replaceBlocks = message.split(" ")[0];
+        var setBlocks = message.split(" ")[1];
+    }
+    let undoCounter = playerInstance.blockArray.length;
+    let counter = 0;
+    world.sendMessage(`Operation completed (Blocks affected: ${blocksAffected})`);
+    const replaceBlockName = replaceBlocks.split(",");
     const lenghtXreplace = (Math.abs(bL1.x - bL2.x) + 1);
     const lenghtYreplace = (Math.abs(bL1.y - bL2.y) + 1);
     const lenghtZreplace = (Math.abs(bL1.z - bL2.z) + 1);
-    var blockLocation = { x: Math.max(bL1.x, bL2.x), y: Math.max(bL1.y, bL2.y), z: Math.max(bL1.z, bL2.z) };
-    deleteRow(undoBlocks, undoCounter);
-    deleteRow(undoBlocksType, undoCounter);
-    const commaMsg = replaceSettingsBlocks.split(",");
-    for (var i = 0; i < commaMsg.length; i++) {
+    const blockLocation = { x: Math.max(bL1.x, bL2.x), y: Math.max(bL1.y, bL2.y), z: Math.max(bL1.z, bL2.z) };
+    //deleteRow(undoBlocks, undoCounter);
+    //deleteRow(undoBlocksType, undoCounter);
+    const commaMsg = setBlocks.split(",");
+    for (let i = 0; i < commaMsg.length; i++) {
         if (commaMsg[i].search("%") == -1) {
             commaMsg[i] = "100%" + commaMsg[i];
         }
     }
-    var percentMsgReplace = [];
-    var blockMsgReplace = [];
-    commaMsg.forEach(item => percentMsgReplace[percentMsgReplace.length] = Math.floor(item.split("%")[0]));
+    let percentMsgReplace = [];
+    let blockMsgReplace = [];
+    commaMsg.forEach(item => percentMsgReplace[percentMsgReplace.length] = Number(item.split("%")[0]));
     commaMsg.forEach(item => blockMsgReplace[blockMsgReplace.length] = item.split("%")[1]);
-    for (var xOffset = 0; xOffset < lenghtXreplace; xOffset++) {
+    for (let xOffset = 0; xOffset < lenghtXreplace; xOffset++) {
         // player.sendMessage(`xOffset ${xOffset}`)
-        for (var yOffset = 0; yOffset < lenghtYreplace; yOffset++) {
+        for (let yOffset = 0; yOffset < lenghtYreplace; yOffset++) {
             //   player.sendMessage(`yOffset ${yOffset}`)
-            for (var zOffset = 0; zOffset < lenghtZreplace; zOffset++) {
-                var iCounterReplace = 0;
-                var offsetBlock = world.getDimension("overworld").getBlock({ x: blockLocation.x - xOffset, y: blockLocation.y - yOffset, z: blockLocation.z - zOffset });
+            for (let zOffset = 0; zOffset < lenghtZreplace; zOffset++) {
+                let iCounterReplace = 0;
+                let offsetBlock = world.getDimension("overworld").getBlock({ x: blockLocation.x - xOffset, y: blockLocation.y - yOffset, z: blockLocation.z - zOffset });
                 let x = Math.round(Math.random() * 100);
-                if ("minecraft:" + replaceBlockName.find(item => "minecraft:" + item == offsetBlock.typeId) == offsetBlock.typeId) {
-                    for (var i = 0; i < percentMsgReplace.length; i++) {
+                world.sendMessage(`Comparing ${offsetBlock.typeId} with ${replaceBlockName}`);
+                if (replaceBlockName.some(item => "minecraft:" + item == offsetBlock.typeId)) {
+                    for (let i = 0; i < percentMsgReplace.length; i++) {
                         //world.sendMessage(`RNG: ${x} Contition <= ${(percentMsg[i] + iCounter)} and > ${iCounter}`)
                         if (x <= percentMsgReplace[i] + iCounterReplace && x >= iCounterReplace) {
-                            undoAdd(offsetBlock, counter);
-                            console.warn(`saved under ${undoBlocks[undoCounter][counter].typeId} at ${undoCounter} ${counter}`);
+                            blockPermutations[counter] = offsetBlock.permutation;
+                            blockLocations[counter] = offsetBlock.location;
+                            console.warn(`saved under ${offsetBlock.typeId} at ${playerInstance.index} ${counter}`);
                             counter++;
-                            world.getDimension("overworld").fillBlocks(offsetBlock.location, offsetBlock.location, MinecraftBlockTypes.get("minecraft:" + blockMsgReplace[i]));
+                            world.getDimension("overworld").fillBlocks(offsetBlock.location, offsetBlock.location, BlockTypes.get("minecraft:" + blockMsgReplace[i]));
                         }
                         iCounterReplace += percentMsgReplace[i];
                     }
@@ -68,7 +86,9 @@ function replaceBlocks(replaceSettings, replaceSettingsBlocks, player) {
             }
         }
     }
-    undoSave(blocksAffected);
+    blockPermutations.length = counter;
+    blockLocations.length = counter;
+    undoSave({ blocks: blockPermutations, locations: blockLocations, affectedBlocks: counter }, playerInstance);
 }
 async function replaceUi(player) {
     var replaceBlock = "";
@@ -82,11 +102,11 @@ async function replaceUi(player) {
     var reSearch = false;
     var resultBlockChoose;
     var searchResult = [];
-    for (var i = 0; i < resultRange.formValues[0]; i++) {
+    for (var i = 0; i < Number(resultRange.formValues[0]); i++) {
         do {
             searchResult = [];
             reSearch = false;
-            const result = await search.show(player);
+            const result = await showHUD(player, search);
             userBusy = result.cancelationReason;
             if (result.formValues[0] == null) {
                 player.sendMessage('§dPlease input something! \n If you want to search for evrything just type "minecraft"');
@@ -112,7 +132,7 @@ async function replaceUi(player) {
         replaceBlock = replaceBlock.concat("" + searchResult[resultBlockChoose.selection - 1].split(":")[1] + ",");
     }
     var overallPercent = 0;
-    for (var i = 0; i < resultRange.formValues[1] && overallPercent < 100; i++) {
+    for (var i = 0; i < Number(resultRange.formValues[1]) && overallPercent < 100; i++) {
         var percent;
         do {
             searchResult = [];
@@ -147,5 +167,5 @@ async function replaceUi(player) {
         replaceBlockWith = replaceBlockWith.concat("" + percent + "%" + searchResult[resultBlockChoose.selection - 1].split(":")[1] + ",");
         world.sendMessage("" + replaceBlockWith);
     }
-    replaceBlocks(replaceBlock, replaceBlockWith, player);
+    replaceBlocks(`${replaceBlock} ${replaceBlockWith}`, player);
 }
